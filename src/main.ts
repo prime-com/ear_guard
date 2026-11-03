@@ -1,5 +1,6 @@
 import { openMic, type Mic } from "./audio/mic";
 import { playSignal, type PlayingSignal, type SignalKind } from "./audio/signals";
+import { looksBluetooth, pickMeasurementMic, suggestsCallMode } from "./audio/micPick";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -7,6 +8,8 @@ let ctx: AudioContext | null = null;
 let playing: PlayingSignal | null = null;
 let mic: Mic | null = null;
 const results: Record<string, unknown>[] = [];
+/** Once the user picks a mic themselves we stop auto-selecting. */
+let userPickedMic = false;
 
 function getCtx(): AudioContext {
   if (!ctx) ctx = new AudioContext({ latencyHint: "interactive" });
@@ -33,11 +36,38 @@ async function refreshDevices() {
     if (prev) sel.value = prev;
   };
   fill($("micSelect"), "audioinput");
+  if (!userPickedMic) {
+    const pick = pickMeasurementMic(devices.filter((d) => d.kind === "audioinput"));
+    if (pick) $<HTMLSelectElement>("micSelect").value = pick.deviceId;
+  }
+  updateMicWarning();
   fill($("outSelect"), "audiooutput");
   // Output selection works only where AudioContext.setSinkId exists (Chromium).
   $("outWrap").hidden = !("setSinkId" in AudioContext.prototype);
   log("devices", { list: devices.map((d) => ({ kind: d.kind, label: d.label })) });
 }
+
+function selectedMicLabel(): string {
+  const sel = $<HTMLSelectElement>("micSelect");
+  return sel.selectedOptions[0]?.textContent ?? "";
+}
+
+function updateMicWarning(callMode = false) {
+  const w = $("micWarn");
+  if (callMode) {
+    w.textContent = "⚠️ The mic opened at a low sample rate — your Bluetooth headphones have probably switched to call mode. Close the mic and choose the built-in microphone.";
+  } else if (looksBluetooth(selectedMicLabel())) {
+    w.textContent = "⚠️ This looks like a Bluetooth headset mic. Opening it switches headphones to call mode and changes their loudness. Choose the built-in microphone.";
+  } else {
+    w.textContent = "";
+  }
+  w.hidden = !w.textContent;
+}
+
+$("micSelect").addEventListener("change", () => {
+  userPickedMic = true;
+  updateMicWarning();
+});
 
 const level = () => Number($<HTMLInputElement>("level").value);
 
@@ -75,13 +105,28 @@ $("micBtn").addEventListener("click", async () => {
   }
   const c = getCtx();
   await c.resume();
+  const hadLabels = !!selectedMicLabel() && !selectedMicLabel().startsWith("(");
   try {
     mic = await openMic(c, $<HTMLSelectElement>("micSelect").value || undefined);
+    // Before permission the browser hides mic names, so the first open uses the system
+    // default — which may be the headset mic. Now names are visible: switch if needed.
+    if (!hadLabels && !userPickedMic) {
+      await refreshDevices();
+      const want = $<HTMLSelectElement>("micSelect").value;
+      if (want && want !== mic.settings.deviceId && (looksBluetooth(mic.label) || suggestsCallMode(mic.settings.sampleRate))) {
+        log("mic-auto-switch", { from: mic.label, reason: "default mic was a Bluetooth headset" });
+        mic.close();
+        mic = await openMic(c, want);
+      }
+    }
   } catch (e) {
     log("mic-error", { error: String(e) });
     return;
   }
   const s = mic.settings;
+  const callMode = suggestsCallMode(s.sampleRate);
+  updateMicWarning(callMode);
+  if (callMode) log("call-mode-suspected", { label: mic.label, sampleRate: s.sampleRate });
   $("micInfo").textContent = `Using: ${mic.label} · echoCancel=${s.echoCancellation} noiseSuppr=${s.noiseSuppression} autoGain=${s.autoGainControl} · ${s.sampleRate ?? c.sampleRate} Hz`;
   $("micBtn").textContent = "Close mic";
   $<HTMLButtonElement>("snapBtn").disabled = false;

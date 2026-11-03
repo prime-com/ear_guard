@@ -102,6 +102,23 @@ Phones need HTTPS for mic access — deploy to GitHub Pages / Vercel, or use a t
 Also verify: does the browser actually honour `echoCancellation:false` etc.? The Lab
 prints what the browser reports — check it, and sanity-check by measuring a known tone.
 
+### Results so far (2026-11-03, MacBook Pro + Sony ULT WEAR over Bluetooth)
+
+| Setup | Mic sample rate | Bluetooth audio |
+|---|---|---|
+| Chrome, **headset's own mic** | 16 kHz | **Changed** — call mode (HFP), music suppressed |
+| Chrome, built-in mic | 48 kHz | Unchanged ✅ |
+| Safari, built-in mic | 44.1 kHz | Unchanged ✅ |
+
+- **Rule: measure with the built-in mic, never the headset mic.** The Lab now auto-picks
+  it (`src/audio/micPick.ts`) and warns on a Bluetooth mic or a ≤16 kHz sample rate.
+- Chrome reports echoCancel/noiseSuppr/autoGain all `false`. **Safari only reports
+  `echoCancellation`**, so NS/AGC being off is unconfirmed there — verify by playing two
+  levels and checking the mic reading moves by the same amount.
+- First Safari readings: −40 dBFS tone → −52 dBFS at the mic, room floor −70 dBFS,
+  repeat readings within 0.4 dB.
+- Still to run: Android Chrome, iPhone Safari (via the GitHub Pages deploy).
+
 **If Bluetooth audio does change when the mic opens,** fall back options to explore:
 force the built-in mic (works on desktop), measure during a mic-closed window, or lean
 harder on the hearing check for Bluetooth devices.
