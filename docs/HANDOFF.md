@@ -54,11 +54,20 @@ Priority of data sources per device: platform data (Apple Health / Android sound
 docs/PLAN.md               full plan: phases, test flow, math, risks, milestones
 docs/HANDOFF.md            this file
 src/core/calibration.ts    calibration + dose math (pure TS, no browser APIs — the
-                           native apps will reuse it). 9 passing tests.
+                           native apps will reuse it). 
 src/core/calibration.test.ts
 src/audio/signals.ts       1 kHz sine, pink noise, log sweep — generated in code
 src/audio/mic.ts           mic capture with echoCancellation/noiseSuppression/autoGain OFF
 src/main.ts, index.html    "EarGuard Lab" prototype UI + JSON result export
+calibrate.html, src/calibrate.ts
+                           guided calibration flow (milestone 2): room check → mic test →
+                           volume steps → hearing check → result, saved in localStorage.
+                           Also a "hearing check only" mode (used by default on iPhone).
+src/core/measure.ts        pure analysis for that flow (room check, mic-test linearity /
+                           SNR / clipping checks, volume steps, hearing summary) + tests
+src/core/profile.ts        saved-profile shape; src/storage.ts = localStorage wrapper
+src/audio/hearing.ts       pulsed 1 kHz tone, −105 → hard cap −55 dBFS at 1.5 dB/s
+src/audio/builtin.ts       opens the built-in mic, refuses Bluetooth/call-mode mics
 ```
 
 Run it:
@@ -80,6 +89,31 @@ headphones or a real mic.**
 
 **Rule: never invent calibration numbers for real devices.** A wrong number here means
 someone under-estimates their exposure. Placeholders must stay obviously placeholder.
+
+## Milestone 2 status (guided calibration)
+
+Built and tested end-to-end in headless Chromium with a **simulated** mic (known offset →
+recovered S_device to <0.1 dB; volume drops and hearing thresholds recovered exactly).
+**Not yet run with a real mic + real headphones** — that is the next thing to do.
+
+Choices made while building it (change if the real-hardware run says so):
+- Mic test plays 1 kHz at −60…−20 dBFS and stops early if the mic reads > −30 dBFS or
+  clips. Each step needs ≥ 15 dB SNR over the room noise; steps must rise ~1 dB/dB
+  (otherwise "not linear" = the browser is probably applying auto-gain — this is the
+  check that covers Safari not reporting noiseSuppression/autoGain).
+- The volume curve is stored as dB vs max at OS-slider 50 % / 25 %. The hearing check runs
+  at max volume, as in the plan.
+- Hearing check: two ascending trials, pulsed tone, keeps the **lowest** threshold
+  (= louder device, the safe side). Reaction delay is deliberately not corrected.
+- Every threshold in `measure.ts` (ROOM_MAX_DBFS, MIN_SNR_DB, …) is a heuristic to tune.
+- Results are labelled "test version — not accurate yet" because COUPLING_CORRECTION and the
+  mic sensitivity are still placeholders. Profiles carry `accuracy: "placeholder"`.
+- Fixed: `combine()` let a lower hearing estimate pull a confident mic result *down*, which
+  broke the safety rule. It can now only raise it (test added).
+- Fixed: readings in the first ~170 ms after opening the mic were too low (empty analyser
+  buffer) and made quiet rooms look "unsteady". `measureFor` now waits 400 ms after open.
+- Not built yet: pink-noise / sweep seal check, per-phone mic sensitivity table, wear-detection
+  handling beyond the on-screen advice.
 
 ## THE IMMEDIATE NEXT TASK — milestone 1
 

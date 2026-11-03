@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EarGuard Calibrate</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Calibrate your headphones <small>test version</small></h1>
+      <p class="banner">
+        <b>Test version — not accurate yet.</b> The numbers use placeholder corrections that haven't been checked against
+        reference equipment, so they can be off by 10 dB or more. Don't use them for health decisions.
+      </p>
+      <p class="warn">⚠️ Loud tones only ever play with the headphones <b>off your head</b>. During the hearing check they're on your head, but the tone starts silent and is capped at a quiet level.</p>
+      <p class="muted" id="progress"></p>
+
+      <section data-step="setup">
+        <h2>Set up</h2>
+        <label>Name <input id="nameIn" type="text" placeholder="e.g. Sony ULT WEAR" maxlength="60" /></label>
+        <label>Type
+          <select id="typeIn">
+            <option value="over-ear">Over-ear</option>
+            <option value="on-ear">On-ear</option>
+            <option value="earbuds">Earbuds / in-ear</option>
+          </select>
+        </label>
+        <label>Connection
+          <select id="connIn">
+            <option value="bluetooth">Bluetooth</option>
+            <option value="wired">Wired</option>
+          </select>
+        </label>
+        <fieldset>
+          <legend>Which test?</legend>
+          <label><input type="radio" name="mode" value="full" checked /> <b>Full test</b> — microphone + hearing check (computer)</label>
+          <label><input type="radio" name="mode" value="hearing" /> <b>Hearing check only</b> — no microphone (iPhone, or if the mic test fails)</label>
+        </fieldset>
+        <p class="muted" id="iosNote" hidden>
+          On iPhone, opening the microphone changes Bluetooth headphone sound (milestone 1 result), so the hearing check is suggested here.
+        </p>
+        <p class="muted">Before you start:</p>
+        <ul class="muted">
+          <li>Turn on <b>Do Not Disturb</b> and close other apps that make sound — the volume will be at maximum.</li>
+          <li>Pick the headphones as the sound output in your system settings.</li>
+          <li>Headphones with <b>wear detection</b> pause when taken off your head. For the mic test, drape them over a pillow or ball so they stay awake.</li>
+          <li>Pick the computer's <b>built-in</b> microphone as the input (never the headphones' own mic).</li>
+        </ul>
+        <p id="setupErr" class="warn" hidden></p>
+        <button id="startBtn">Start</button>
+        <button id="stopAllBtn" class="secondary">Stop all sound</button>
+      </section>
+
+      <section data-step="room" hidden>
+        <h2>Room check</h2>
+        <p>Stay quiet for a few seconds while the microphone listens to the room.</p>
+        <p id="roomStatus" class="big small">…</p>
+        <button id="roomRetry" hidden>Try again</button>
+        <button id="roomNext" hidden>Continue</button>
+        <button id="roomSkip" class="secondary">Skip to hearing check only</button>
+      </section>
+
+      <section data-step="mic" hidden>
+        <h2>Microphone test</h2>
+        <p class="muted" id="outInfo"></p>
+        <ol>
+          <li>Set the computer's volume to <b>maximum</b>.</li>
+          <li>Put the headphones <b>off your head</b>, on a table or pillow.</li>
+          <li>Press <b>one earcup/earbud flat against the computer's microphone</b> (on most laptops: the tiny hole next to the camera or keyboard).</li>
+          <li>Check: the sound comes from the <b>headphones</b>, not the laptop speakers.</li>
+        </ol>
+        <label><input type="checkbox" id="micReady" /> Volume is at maximum, the headphones are off my head and against the mic, and the sound comes from them.</label>
+        <p id="micStatus" class="big small"></p>
+        <button id="micGo" disabled>Play test tones</button>
+        <button id="micSkip" class="secondary">Skip to hearing check only</button>
+        <p id="micErr" class="warn" hidden></p>
+      </section>
+
+      <section data-step="volume" hidden>
+        <h2>Volume steps — <span id="volTarget"></span></h2>
+        <p>Keep the headphones against the mic. Now set the computer's volume to about <b id="volPct"></b> of the maximum, then press the button.</p>
+        <p id="volStatus" class="big small"></p>
+        <button id="volGo">Measure this volume</button>
+        <button id="volNext" hidden>Next</button>
+        <button id="volSkip" class="secondary">Skip volume steps</button>
+        <p id="volErr" class="warn" hidden></p>
+      </section>
+
+      <section data-step="hearing" hidden>
+        <h2>Hearing check <span id="hearTrialNo"></span></h2>
+        <div id="hearPrep">
+          <ol>
+            <li>The microphone is now off.</li>
+            <li>Set the volume back to <b>maximum</b>.</li>
+            <li>Put the headphones <b>on your head</b>. Sit somewhere quiet.</li>
+            <li>A very faint, pulsing beep will slowly get louder from silence. Press <b>I hear it</b> the moment you first hear it (or press the space bar). Don't guess — if you're unsure, wait.</li>
+          </ol>
+          <button id="hearStart">Start</button>
+        </div>
+        <div id="hearRun" hidden>
+          <p>Listen… press the button as soon as you hear the beep.</p>
+          <div class="meter"><div id="hearBar"></div></div>
+          <button id="hearBtn" class="big-btn">I hear it</button>
+          <button id="hearCancel" class="secondary">Stop</button>
+        </div>
+        <p id="hearMsg" class="muted"></p>
+      </section>
+
+      <section data-step="result" hidden>
+        <h2>Result</h2>
+        <p class="banner">Test version — placeholder corrections, not accurate yet.</p>
+        <p class="muted">At maximum volume, a full-scale 1 kHz tone reaches about:</p>
+        <p class="big" id="resMain">—</p>
+        <p class="muted" id="resRange"></p>
+        <p id="resDose"></p>
+        <p id="resConf"></p>
+        <details>
+          <summary>Details</summary>
+          <pre id="resDetails"></pre>
+        </details>
+        <p class="muted" id="resSaved"></p>
+        <button id="againBtn">Calibrate another</button>
+      </section>
+
+      <section id="savedBox">
+        <h2>Saved on this device</h2>
+        <ul id="savedList" class="saved"></ul>
+        <p class="muted" id="savedEmpty">Nothing saved yet.</p>
+        <button id="exportAll" class="secondary">Download all (JSON)</button>
+      </section>
+
+      <p class="muted"><a href="./">← Back to the Lab</a></p>
+    </main>
+    <script type="module" src="/src/calibrate.ts"></script>
+  </body>
+</html>

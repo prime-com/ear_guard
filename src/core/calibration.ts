@@ -96,7 +96,10 @@ export function combine(mic?: Estimate, hearing?: Estimate): CalibrationResult {
     if (Math.abs(mic.value - hearing.value) <= AGREEMENT_DB) {
       const w1 = 1 / mic.sigma ** 2;
       const w2 = 1 / hearing.sigma ** 2;
-      est = { value: (mic.value * w1 + hearing.value * w2) / (w1 + w2), sigma: Math.sqrt(1 / (w1 + w2)) };
+      const merged = (mic.value * w1 + hearing.value * w2) / (w1 + w2);
+      // The hearing check is biased LOW (hearing loss, room noise), so it may raise the
+      // mic result but must never pull it down (HANDOFF safety rule).
+      est = { value: Math.max(merged, mic.value), sigma: Math.sqrt(1 / (w1 + w2)) };
       confidence = "confident";
     } else {
       est = mic.value >= hearing.value ? mic : hearing; // louder one

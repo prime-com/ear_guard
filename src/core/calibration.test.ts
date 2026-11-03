@@ -42,6 +42,12 @@ describe("calibration", () => {
     expect(r.conservative).toBeGreaterThan(r.sDevice.value);
   });
 
+  it("a lower hearing estimate never pulls the mic result down", () => {
+    const r = combine({ value: 100, sigma: 4 }, { value: 97, sigma: 5 });
+    expect(r.confidence).toBe("confident");
+    expect(r.sDevice.value).toBeGreaterThanOrEqual(100);
+  });
+
   it("disagreeing estimates use the louder one", () => {
     const r = combine({ value: 95, sigma: 4 }, { value: 108, sigma: 5 });
     expect(r.confidence).toBe("retest-suggested");

@@ -4,6 +4,8 @@ import { blockRmsDbfs } from "../core/calibration";
 export interface Mic {
   label: string;
   settings: MediaTrackSettings;
+  /** performance.now() when the mic was opened; the analyser buffer is only full ~170 ms later. */
+  openedAt: number;
   readDbfs(): number;
   readPeak(): number;
   close(): void;
@@ -29,6 +31,7 @@ export async function openMic(ctx: AudioContext, deviceId?: string): Promise<Mic
   return {
     label: track.label,
     settings: track.getSettings(),
+    openedAt: performance.now(),
     readDbfs() {
       analyser.getFloatTimeDomainData(buf);
       return blockRmsDbfs(buf);
