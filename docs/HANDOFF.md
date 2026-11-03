@@ -109,6 +109,7 @@ prints what the browser reports — check it, and sanity-check by measuring a kn
 | Chrome, **headset's own mic** | 16 kHz | **Changed** — call mode (HFP), music suppressed |
 | Chrome, built-in mic | 48 kHz | Unchanged ✅ |
 | Safari, built-in mic | 44.1 kHz | Unchanged ✅ |
+| **iPhone** (iOS 26.2, Chrome = WebKit), built-in "iPhone Microphone" | 48 kHz | **Changed** ❌ |
 
 - **Rule: measure with the built-in mic, never the headset mic.** The Lab now auto-picks
   it (`src/audio/micPick.ts`) and warns on a Bluetooth mic or a ≤16 kHz sample rate.
@@ -117,7 +118,19 @@ prints what the browser reports — check it, and sanity-check by measuring a kn
   levels and checking the mic reading moves by the same amount.
 - First Safari readings: −40 dBFS tone → −52 dBFS at the mic, room floor −70 dBFS,
   repeat readings within 0.4 dB.
-- Still to run: Android Chrome, iPhone Safari (via the GitHub Pages deploy).
+- **iPhone: opening any mic in a web page changes Bluetooth audio**, even with the
+  built-in mic selected. iOS switches the audio session to play-and-record. The mic still
+  reports 48 kHz, so the ≤16 kHz call-mode check does **not** catch this on iOS — the
+  sample rate describes the mic, not the headphone link.
+  → On iPhone, the web mic test can't measure Bluetooth headphones. Use the hearing
+  check there, run the mic test from a Mac/Android instead, or (native app) Apple Health.
+- iPhone Safari mutes Web Audio in Silent mode; the Lab sets `navigator.audioSession.type
+  = "playback"` to fix that (worked: tone played).
+- **Wear detection** (Sony ULT WEAR, AirPods, many others) pauses or re-routes audio when
+  the headphones come off the head — this clashes with "loud tones only off the head".
+  The calibration flow must handle it (ask users to disable it, or keep the head-shaped
+  object trick). Unsolved.
+- Still to run: Android Chrome.
 
 **If Bluetooth audio does change when the mic opens,** fall back options to explore:
 force the built-in mic (works on desktop), measure during a mic-closed window, or lean
