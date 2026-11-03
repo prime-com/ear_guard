@@ -27,3 +27,5 @@ Mic access on a phone needs HTTPS (or localhost) — use the deployed version fo
 
 ## License
 MIT
+
+> New here? Start with **[docs/HANDOFF.md](docs/HANDOFF.md)** for full context.
