@@ -11,6 +11,21 @@ const results: Record<string, unknown>[] = [];
 /** Once the user picks a mic themselves we stop auto-selecting. */
 let userPickedMic = false;
 
+/**
+ * iOS Safari mutes Web Audio when the Silent switch is on unless the page declares a
+ * "playback" audio session (Safari 16.4+). Opening the mic needs "play-and-record".
+ */
+function setAudioSession(type: "playback" | "play-and-record") {
+  const session = (navigator as any).audioSession;
+  if (!session) return;
+  try {
+    session.type = type;
+    log("audio-session", { type });
+  } catch (e) {
+    log("audio-session-error", { type, error: String(e) });
+  }
+}
+
 function getCtx(): AudioContext {
   if (!ctx) ctx = new AudioContext({ latencyHint: "interactive" });
   return ctx;
@@ -84,6 +99,7 @@ $("playBtn").addEventListener("click", async () => {
     log("stop");
     return;
   }
+  if (!mic) setAudioSession("playback");
   const c = getCtx();
   await c.resume();
   const out = $<HTMLSelectElement>("outSelect").value;
@@ -101,10 +117,12 @@ $("micBtn").addEventListener("click", async () => {
     $("micBtn").textContent = "Open mic";
     $<HTMLButtonElement>("snapBtn").disabled = true;
     log("mic-closed");
+    setAudioSession("playback");
     return;
   }
   const c = getCtx();
   await c.resume();
+  setAudioSession("play-and-record");
   const hadLabels = !!selectedMicLabel() && !selectedMicLabel().startsWith("(");
   try {
     mic = await openMic(c, $<HTMLSelectElement>("micSelect").value || undefined);
