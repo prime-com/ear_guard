@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EarGuard Lab</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>EarGuard Lab <small>prototype · milestone 1</small></h1>
+      <p class="muted">Tests whether a browser can play calibrated tones and measure them with your mic — and whether opening the mic breaks Bluetooth audio.</p>
+      <p class="warn">⚠️ Keep headphones <b>off your ears</b> while playing loud tones. Start with the level low.</p>
+
+      <section>
+        <h2>1 · Devices</h2>
+        <label>Microphone <select id="micSelect"></select></label>
+        <label id="outWrap">Output <select id="outSelect"></select></label>
+        <button id="refreshBtn">Refresh devices</button>
+      </section>
+
+      <section>
+        <h2>2 · Test signal</h2>
+        <label>Signal
+          <select id="kind">
+            <option value="sine">1 kHz tone</option>
+            <option value="pink">Pink noise</option>
+            <option value="sweep">Sweep 100 Hz–10 kHz (5 s)</option>
+          </select>
+        </label>
+        <label>Level <input id="level" type="range" min="-80" max="0" step="1" value="-40" /> <output id="levelOut">-40 dBFS</output></label>
+        <button id="playBtn">Play</button>
+      </section>
+
+      <section>
+        <h2>3 · Microphone meter</h2>
+        <button id="micBtn">Open mic</button>
+        <div class="meter"><div id="bar"></div></div>
+        <p class="big"><span id="micDb">—</span> dBFS <span id="clip" class="clip" hidden>CLIPPING</span></p>
+        <p class="muted" id="micInfo"></p>
+        <button id="snapBtn" disabled>Record reading</button>
+      </section>
+
+      <section>
+        <h2>4 · Bluetooth check</h2>
+        <ol class="muted">
+          <li>Connect Bluetooth headphones, put the level low, press <b>Play</b> and listen.</li>
+          <li>Press <b>Open mic</b> (choose the built-in mic above) while it plays.</li>
+          <li>Did the sound change (quieter, muffled, stopped, switched device)?</li>
+        </ol>
+        <button data-bt="unchanged">Sound unchanged</button>
+        <button data-bt="changed">Sound changed</button>
+      </section>
+
+      <section>
+        <h2>Log</h2>
+        <button id="exportBtn">Download results (JSON)</button>
+        <pre id="log"></pre>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
