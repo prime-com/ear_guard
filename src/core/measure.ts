@@ -59,14 +59,15 @@ export type RoomProblem = "no-signal" | "too-loud" | "unsteady";
 export interface RoomResult {
   ok: boolean;
   noiseDbfs: number;
+  spreadDb: number;
   problem?: RoomProblem;
 }
 
 export function checkRoom(b: Block): RoomResult {
-  if (!Number.isFinite(b.dbfs) || b.dbfs < MIC_DEAD_DBFS) return { ok: false, noiseDbfs: b.dbfs, problem: "no-signal" };
-  if (b.dbfs > ROOM_MAX_DBFS) return { ok: false, noiseDbfs: b.dbfs, problem: "too-loud" };
-  if (b.spreadDb > ROOM_MAX_SPREAD_DB) return { ok: false, noiseDbfs: b.dbfs, problem: "unsteady" };
-  return { ok: true, noiseDbfs: b.dbfs };
+  if (!Number.isFinite(b.dbfs) || b.dbfs < MIC_DEAD_DBFS) return { ok: false, noiseDbfs: b.dbfs, spreadDb: b.spreadDb, problem: "no-signal" };
+  if (b.dbfs > ROOM_MAX_DBFS) return { ok: false, noiseDbfs: b.dbfs, spreadDb: b.spreadDb, problem: "too-loud" };
+  if (b.spreadDb > ROOM_MAX_SPREAD_DB) return { ok: false, noiseDbfs: b.dbfs, spreadDb: b.spreadDb, problem: "unsteady" };
+  return { ok: true, noiseDbfs: b.dbfs, spreadDb: b.spreadDb };
 }
 
 /** Removes the room's noise power from a reading. null if the reading is not above the noise. */

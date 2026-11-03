@@ -115,6 +115,32 @@ Choices made while building it (change if the real-hardware run says so):
 - Not built yet: pink-noise / sweep seal check, per-phone mic sensitivity table, wear-detection
   handling beyond the on-screen advice.
 
+### First real-hardware run of the calibration page (2026-11-04, ~3 am)
+
+- **Hearing-only mode worked** (Sony ULT WEAR, Bluetooth): thresholds −76.6 / −79.2 dBFS,
+  2.6 dB apart (consistent) → S_device ≈ 85 ± 5 dB, dose value 90 dB, confidence
+  "hearing-only". Unverified: not known whether volume was at max; hearing-only reads low by
+  design; no reference to compare with yet. Saved as "Unnamed headphones" (name left empty).
+- **OPEN ISSUE — room check rejects a quiet room.** The full test could not get past the room
+  check at 3 am in a quiet room. Cause unknown. Suspects: `ROOM_MAX_DBFS = −55` is too strict
+  for the MacBook mic's own noise floor (earlier Lab readings of the room were −66…−70
+  dBFS, but those used other mics), or `ROOM_MAX_SPREAD_DB = 8` trips on a fluctuating floor
+  (e.g. Mac fan/auto level). The failure message now prints the measured level, swing and
+  limits — **read those numbers first**, then set the thresholds from real data (don't just
+  loosen them blindly; the room check exists so the mic test isn't drowned in noise, and the
+  mic test has its own per-step SNR gate of 15 dB).
+- Was the run on Mac or iPhone, and was volume at max? Not confirmed with the user.
+
+## NEXT STEPS (pick up here)
+
+1. Re-run the **full test** on the Mac (Chrome, built-in mic, Sony on a pillow, volume max)
+   and read the room-check numbers in the message if it fails again. Fix thresholds from data.
+2. Compare mic estimate vs hearing estimate; discuss the gap.
+3. Milestone 3 accuracy check (AirPods + Apple Health, wired headphones with published specs)
+   to replace the placeholder `COUPLING_CORRECTION` / mic sensitivity.
+4. Android Chrome milestone-1 run (no Android phone was available).
+5. Later: headphone/phone database, native apps (see "After milestone 1" below).
+
 ## THE IMMEDIATE NEXT TASK — milestone 1
 
 **Find out whether opening the microphone breaks Bluetooth audio.** On many

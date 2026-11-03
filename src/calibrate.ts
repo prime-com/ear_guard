@@ -10,6 +10,8 @@ import {
   checkRoom,
   CLIP_PEAK,
   MIC_CEILING_DBFS,
+  ROOM_MAX_DBFS,
+  ROOM_MAX_SPREAD_DB,
   summarizeHearing,
   volumeStep,
   type MicStep,
@@ -150,7 +152,10 @@ async function runRoom() {
     setText("roomStatus", `Quiet enough ✓ (background ≈ ${r.noiseDbfs.toFixed(0)} dBFS)`);
     show("roomNext");
   } else {
-    setText("roomStatus", ROOM_MESSAGES[r.problem!]);
+    setText(
+      "roomStatus",
+      `${ROOM_MESSAGES[r.problem!]} (Measured ${r.noiseDbfs.toFixed(1)} dBFS, swing ${r.spreadDb.toFixed(1)} dB; limits are ${ROOM_MAX_DBFS} dBFS and ${ROOM_MAX_SPREAD_DB} dB.)`,
+    );
     show("roomRetry");
   }
 }
