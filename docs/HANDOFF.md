@@ -10,7 +10,7 @@ any brand, wired or Bluetooth, on any platform. Free, no account, listening data
 on the device. It also tracks how much of your safe weekly listening you've used
 (WHO / ITU-T H.870: 80 dB(A) × 40 h/week).
 
-Repo: https://github.com/prime-com/ear_guard · Owner: prime-com (Jayesh) · License: MIT
+Repo: https://github.com/prime-com/ear_guard · Owner: prime-com (Tanmay) · License: MIT
 
 ## Decisions already made — don't re-litigate these
 
