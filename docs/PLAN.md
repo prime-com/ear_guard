@@ -99,6 +99,30 @@ The core math (`src/core/`) stays pure TypeScript. For native apps we **port it 
 test vectors** (JSON input/output pairs) so every port is checked against the same
 expectations.
 
+### 3a. M3 result — Mac feasibility (macOS 26.6, Swift 6.3, Sony ULT WEAR over Bluetooth)
+
+Code: `spike/mac-audio/` (`swift run spike 10`). All three needs are met:
+
+| Need | How | Result |
+|---|---|---|
+| Output device name + type | Core Audio default output device: `kAudioObjectPropertyName`, `kAudioDevicePropertyTransportType` | ✅ "SONY ULT WEAR", transport `blue` (Bluetooth); built-in is `bltn`, USB `usb ` |
+| Output volume | virtual main volume (`vmvc`) → 0…1 slider position | ✅ works for Bluetooth. `VolumeDecibels` returns 0 → **no real dB**, so slider→dB mapping is still ours |
+| System output signal level | Core Audio **process tap** (`CATapDescription` global tap + private aggregate device with the output device as sub-device), macOS ≥ 14.2 | ✅ 48 kHz stereo float; level moved with the music (−11…−21 dBFS, peaks 0.4–0.74) |
+
+Findings that shape the app:
+- The tap reads the signal **before** the volume is applied (same ≈ −15 dBFS at volume 0.44 and
+  0.0625), so signal level and volume are cleanly separate inputs to the formula.
+- **Permission:** capture returns pure silence, with no error, until the host app has
+  *System Settings → Privacy & Security → Screen & System Audio Recording → "System Audio
+  Recording Only"*. A tool run from VS Code's helper gets silence; from Terminal it works once
+  Terminal is added. The real app needs `NSAudioCaptureUsageDescription` in its Info.plist and
+  must explain the permission in onboarding. Detect "all silence while volume > 0" and tell
+  the user.
+- Bluetooth: no gain in dB is exposed, only the slider. Absolute-volume behaviour on the
+  headphone side is unknown and stays inside `S_device`'s uncertainty.
+- Still to check later: per-app audio, multi-output setups, device switches while running,
+  sleep/wake, an Info.plist-bundled app (the spike is a bare executable).
+
 ### Volume curve
 Slider position → dB is not linear and differs per OS and, for Bluetooth, per device
 (absolute volume). Measured once: Mac slider at 50 % ≈ −17 dB on the Sony. The apps need a
@@ -112,7 +136,7 @@ per-platform mapping, ideally from reading the actual device gain rather than th
 |---|---|---|
 | M1 | Web prototype & Bluetooth-mic test | ✅ done (Android untested) |
 | M2 | Guided calibration flow | ✅ built and run end to end; **retired as main path** |
-| **M3** | **Mac spike:** can a native Mac app get (a) the system output signal level, (b) the output volume or gain, (c) the output device name, for Bluetooth and wired? Write down what needs permissions | A short written result + a tiny working prototype |
+| ✅ **M3** | **Mac spike (DONE 2026-11-04, see §3a):** can a native Mac app get (a) the system output signal level, (b) the output volume or gain, (c) the output device name, for Bluetooth and wired? Write down what needs permissions | A short written result + a tiny working prototype |
 | M4 | Mac menu-bar app: live dB from layer 3 + dose tracking, local only | Runs for a day without crashing; dose matches hand calculation |
 | M5 | Database format + schema CI + first entries (needs a measurement rig or a collaborator who has one) | ≥ 5 models measured with published method |
 | M6 | Verify the layer-3 default against standards and the first measurements; publish error data | Written accuracy report |

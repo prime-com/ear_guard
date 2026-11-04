@@ -165,12 +165,10 @@ milestone 3 against a reference.
 
 ## NEXT STEPS (pick up here) — v2
 
-1. **M3 — Mac spike.** In a tiny native Swift prototype, find out whether we can get:
-   (a) the system output signal level, (b) the output volume/gain, (c) the output device
-   name — for Bluetooth and wired — and which permissions each needs (Core Audio process
-   taps, ScreenCaptureKit, a virtual driver, …). Write the result into `docs/PLAN.md`.
-   Swift 6.3.2 (Command Line Tools) is installed on the user's Mac, macOS 26.6 — full Xcode
-   not confirmed. The spike lives in `spike/mac-audio/` (SwiftPM, no Xcode needed).
+1. **M3 — Mac spike: DONE and successful** (details in `docs/PLAN.md` §3a; code in
+   `spike/mac-audio/`). A native Mac app can read the device name/type, the volume slider and
+   the pre-volume system audio level. Capture needs the "System Audio Recording" permission
+   (silent zeros without it). The user ran it from Terminal after enabling that permission.
 2. M4: Mac menu-bar app with the cautious estimate + dose tracking (port `src/core/`;
    share JSON test vectors between TypeScript and Swift).
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
