@@ -9,6 +9,7 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
     private let tracker = Tracker(store: DoseStore(url: DoseStore.defaultURL()))
     private var lastOutput: OutputInfo?
     private var errorText: String?
+    private var bluetoothInput: String?
 
     private let headerItem = NSMenuItem()
     private let deviceItem = NSMenuItem()
@@ -41,6 +42,7 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
         monitor.onReading = { [weak self] r in
             guard let self else { return }
             self.lastOutput = r.output
+            self.bluetoothInput = r.bluetoothInput
             self.errorText = nil
             self.tracker.handle(r)
             self.refresh()
@@ -90,6 +92,10 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
                 hintItem.title = "If something is playing, allow System Audio Recording (menu below)."
                 hintItem.isHidden = false
             }
+        }
+        if let b = bluetoothInput {
+            hintItem.title = "⚠︎ Mic input is \(b): can switch headphones to call mode. Set Sound → Input to the Mac's mic."
+            hintItem.isHidden = false
         }
         if let e = errorText { levelItem.title = "Problem: \(e)"; detailItem.title = "Open 'Audio permission settings…'." }
         todayItem.title = "Today: \(pct(tracker.todayFraction())) of the weekly limit"

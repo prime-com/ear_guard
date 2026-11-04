@@ -18,6 +18,7 @@ func runHeadless(seconds: Int) {
         case .silent: line += "silent"
         }
         print(line)
+        if let b = r.bluetoothInput { print("  ⚠︎ default mic input is \(b) (Bluetooth): can switch headphones to call mode — set System Settings → Sound → Input to the Mac's mic") }
         n += 1
         if n >= seconds { monitor.stop(); exit(0) }
     }

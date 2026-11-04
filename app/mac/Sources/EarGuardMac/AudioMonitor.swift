@@ -9,6 +9,7 @@ final class AudioMonitor {
         var output: OutputInfo
         var window: LevelMeter.Window?   // nil if no audio callbacks arrived
         var seconds: Double
+        var bluetoothInput: String?   // default mic is a Bluetooth device (call-mode risk)
     }
 
     var onReading: ((Reading) -> Void)?
@@ -56,7 +57,7 @@ final class AudioMonitor {
         let seconds = now.timeIntervalSince(lastTick)
         lastTick = now
         let info = readOutputInfo(device)
-        onReading?(Reading(output: info, window: meter?.takeWindow(), seconds: seconds))
+        onReading?(Reading(output: info, window: meter?.takeWindow(), seconds: seconds, bluetoothInput: bluetoothDefaultInputName()))
     }
 
     private func installListenerOnce() {

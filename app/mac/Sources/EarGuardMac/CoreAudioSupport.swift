@@ -111,3 +111,12 @@ enum ClockMode: String {
 
     static var current: ClockMode { ProcessInfo.processInfo.environment["EARGUARD_CLOCK"].flatMap(ClockMode.init) ?? .builtin }
 }
+
+/// Name of the default INPUT device if it is a Bluetooth one. A Bluetooth default input makes any app
+/// that opens a mic switch the headset to call mode (HFP): music turns quiet and "phone-like".
+func bluetoothDefaultInputName() -> String? {
+    guard let dev = getProperty(systemObject, addr(kAudioHardwarePropertyDefaultInputDevice), AudioObjectID(0)) else { return nil }
+    let transport = fourCC(getProperty(dev, addr(kAudioDevicePropertyTransportType), UInt32(0)) ?? 0)
+    guard transport == "blue" || transport == "blea" else { return nil }
+    return getProperty(dev, addr(kAudioObjectPropertyName), "" as CFString) as String? ?? "a Bluetooth device"
+}
