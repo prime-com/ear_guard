@@ -297,3 +297,10 @@ harder on the hearing check for Bluetooth devices.
 - dBFS follows AES17 (full-scale sine = 0 dBFS).
 - Anything uncertain gets a sigma and is shown to the user as a range, never a bare number.
 - Loud tones are only ever played with headphones off the head; the UI must keep warning this.
+
+## Windows spike result (run on the user's PC, Sony ULT WEAR over Bluetooth)
+- Device detected: "Headphones (ULT WEAR Stereo)", bus BTHENUM = Bluetooth. A separate Hands-Free (BTHHFENUM) endpoint exists; it only matters if something opens it.
+- WASAPI loopback is BEFORE the master volume: level stayed about -10 to -14 dBFS while the volume went 0.18 -> 0.76. This is what we want.
+- IAudioEndpointVolume gives real dB (0.20 = -23.6, 0.50 = -10.3, 0.76 = -4.1, 0.37 = -14.7), not a 20*log10 guess. Windows does not need the Mac's assumed volume curve.
+- Unknown: how the headset maps the Bluetooth volume to sound pressure (S_device is still the placeholder).
+- Next: Windows tray app reusing the C#-free core (port Dose/Estimate/AWeighting).
