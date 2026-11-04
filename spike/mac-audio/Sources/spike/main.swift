@@ -65,6 +65,8 @@ let agg: [String: Any] = [
     kAudioAggregateDeviceNameKey: "EarGuardSpike",
     kAudioAggregateDeviceUIDKey: aggUID,
     kAudioAggregateDeviceIsPrivateKey: true,
+    kAudioAggregateDeviceMainSubDeviceKey: uid,
+    kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: uid]],
     kAudioAggregateDeviceTapAutoStartKey: true,
     kAudioAggregateDeviceTapListKey: [[
         kAudioSubTapUIDKey: desc.uuid.uuidString,
@@ -75,6 +77,11 @@ var aggID = AudioObjectID(kAudioObjectUnknown)
 st = AudioHardwareCreateAggregateDevice(agg as CFDictionary, &aggID)
 print("    create aggregate device: status \(st)")
 guard st == noErr else { exit(3) }
+
+if var f = get(tapID, addr(kAudioTapPropertyFormat), AudioStreamBasicDescription()) {
+    print("    tap format: \(f.mSampleRate) Hz, \(f.mChannelsPerFrame) ch, \(f.mBitsPerChannel) bit, flags \(f.mFormatFlags)")
+    f.mSampleRate = f.mSampleRate
+}
 
 var callbacks = 0
 var sumSq = 0.0, count = 0.0, peak: Float = 0
