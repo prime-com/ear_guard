@@ -11,3 +11,5 @@ android/build/
 android/app/build/
 android/local.properties
 *.apk
+app/windows/**/bin/
+app/windows/**/obj/
