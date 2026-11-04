@@ -1,3 +1,4 @@
+import { showBuild } from "./build";
 import { openMic, type Mic } from "./audio/mic";
 import { playSignal, type PlayingSignal, type SignalKind } from "./audio/signals";
 import { looksBluetooth, pickMeasurementMic, suggestsCallMode } from "./audio/micPick";
@@ -198,3 +199,4 @@ navigator.mediaDevices.addEventListener("devicechange", () => {
   refreshDevices();
 });
 refreshDevices();
+showBuild();

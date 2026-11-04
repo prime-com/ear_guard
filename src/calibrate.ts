@@ -1,3 +1,4 @@
+import { showBuild } from "./build";
 import {
   combine,
   DEFAULT_MIC_SENSITIVITY,
@@ -431,3 +432,4 @@ $("exportAll").addEventListener("click", () => download(`earguard-profiles-${Dat
 window.addEventListener("pagehide", stopAll);
 renderSaved();
 go("setup");
+showBuild();
