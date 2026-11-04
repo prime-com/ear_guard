@@ -169,12 +169,13 @@ milestone 3 against a reference.
    (a) the system output signal level, (b) the output volume/gain, (c) the output device
    name — for Bluetooth and wired — and which permissions each needs (Core Audio process
    taps, ScreenCaptureKit, a virtual driver, …). Write the result into `docs/PLAN.md`.
-   Needs Xcode/Swift on the user's Mac — check it is installed first.
+   Swift 6.3.2 (Command Line Tools) is installed on the user's Mac, macOS 26.6 — full Xcode
+   not confirmed. The spike lives in `spike/mac-audio/` (SwiftPM, no Xcode needed).
 2. M4: Mac menu-bar app with the cautious estimate + dose tracking (port `src/core/`;
    share JSON test vectors between TypeScript and Swift).
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
-   standards and measured data. **Open question for the user: do they have, or can they get
-   access to, a measurement rig or a collaborator with one?**
+   standards and published specs. **No measurement rig is available (user, 2026-11-04) —
+   don't ask again;** layer 2 is spec-derived only.
 4. Android Chrome milestone-1 run (no Android phone yet) — low priority now.
 5. Optional cleanup: label the calibrate page "experimental / for contributors" and link
    it away from the main Lab page.

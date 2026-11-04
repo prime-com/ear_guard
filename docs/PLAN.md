@@ -61,6 +61,12 @@ default must sit at the loud end of what real headphones do.
 - Always displayed as an estimate with a wide range.
 
 ### Layer 2 — headphone database
+- **No measurement rig is available (decision 2026-11-04).** So the database cannot start
+  from our own measurements. Until a rig or collaborator appears, entries come from
+  **published specs** (wired headphones: sensitivity + impedance) and from **Apple Health
+  reference readings** (Apple/Beats). Every entry records its method, and spec-derived
+  entries carry a wider sigma. Bluetooth headphones without a published or measured number
+  fall back to layer 3.
 - Plain files, one per model, in `data/headphones/` (JSON). Fields: id, brand, model,
   type, connection, `S_device {value, sigma}`, method, measured_by, date, rig, notes.
 - Contributing = measuring with a reference rig (ear/coupler simulator + calibrated mic)
@@ -117,9 +123,10 @@ per-platform mapping, ideally from reading the actual device gain rather than th
 ---
 
 ## 5. Risks
-1. **No measurement rig yet.** Layer 2 needs real gear. Until then the app is
-   layer 3 only (wide ranges). Mitigation: find a collaborator/lab; use Apple Health on
-   Apple/Beats headphones as a free reference.
+1. **No measurement rig, and none planned.** Layer 2 is spec-derived only, so most
+   Bluetooth headphones run on layer 3 (wide ranges). Mitigation: label every number's
+   source; use Apple Health on Apple/Beats headphones as a free reference; accept a
+   collaborator's measurements if one appears.
 2. **macOS may restrict reading system audio** (permissions, Bluetooth absolute volume).
    Mitigation: the M3 spike comes before any UI work.
 3. **Cautious default may be too loud/quiet for typical headphones.** Mitigation: derive it
