@@ -187,8 +187,10 @@ milestone 3 against a reference.
    **iPhone (user request 2026-11-04): "what we have on Mac on iPhone, free, maybe Expo Go".**
    Answer + build: see `docs/PLAN.md` §3c. Live capture is impossible on iOS; Expo Go can't read
    HealthKit; native HealthKit realistically needs Xcode + $99/yr. Built the free route
-   `health.html` (Health export → weekly dose, local only). **Next: user tries it with a real
-   Health export on the iPhone** and reports problems (e.g. huge file memory, date formats,
+   `health.html` (Health export → weekly dose, local only). **VERIFIED on a real iPhone Health export
+   (user, 2026-11-04):** parsed, dose/average/day-by-day consistent with the user's own EarPods test. Remaining
+   things to watch for in other people's exports: very large files, Files-app auto-unzip, no records when
+   Headphone Audio Levels is off (e.g. huge file memory, date formats,
    Files app auto-unzipping, no headphone records because Headphone Audio Levels is off).
    **INCIDENT 2026-11-04 (resolved): the Sony went into call mode (HFP) while EarGuard was NOT running.**
    Root cause: after the headphones reconnected, macOS made the Sony the default INPUT again; with that
