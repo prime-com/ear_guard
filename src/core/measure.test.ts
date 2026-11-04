@@ -29,11 +29,21 @@ describe("room check", () => {
     expect(checkRoom({ dbfs: -70, peak: 0.01, spreadDb: 2 }).ok).toBe(true);
   });
   it("rejects a loud room", () => {
-    expect(checkRoom({ dbfs: -30, peak: 0.1, spreadDb: 2 }).problem).toBe("too-loud");
+    expect(checkRoom({ dbfs: -20, peak: 0.1, spreadDb: 2 }).problem).toBe("too-loud");
   });
   it("accepts the ordinary daytime floors measured on a MacBook (Chrome −42, Safari −51)", () => {
     expect(checkRoom({ dbfs: -42, peak: 0.05, spreadDb: 7.6 }).ok).toBe(true);
     expect(checkRoom({ dbfs: -51, peak: 0.05, spreadDb: 3 }).ok).toBe(true);
+  });
+  it("passes the real MacBook run that only just missed (room −45.1, tones −20/−10/0)", () => {
+    const steps = [
+      { playedDbfs: -20, micDbfs: -30.3, peak: 0.05 },
+      { playedDbfs: -10, micDbfs: -20.1, peak: 0.12 },
+      { playedDbfs: 0, micDbfs: -10.1, peak: 0.4 },
+    ];
+    const r = analyzeMicTest(steps, -45.1, opts);
+    expect(r.ok).toBe(true);
+    expect(r.steps.filter((s) => s.usable).length).toBeGreaterThanOrEqual(2);
   });
   it("derives its limit from what a 15 dB-SNR tone needs", () => {
     expect(ROOM_MAX_DBFS).toBe(MIC_CEILING_DBFS - MIN_SNR_DB);

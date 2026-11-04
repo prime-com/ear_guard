@@ -33,7 +33,7 @@ type Mode = "full" | "hearing";
 type Step = "setup" | "room" | "mic" | "volume" | "hearing" | "result";
 
 /** Levels (dBFS) of the rising 1 kHz tone in the mic test. The loop stops early if the mic gets loud or clips. */
-const MIC_TEST_LEVELS = [-60, -50, -40, -30, -20, -10]; // headphones are OFF the head here
+const MIC_TEST_LEVELS = [-60, -50, -40, -30, -20, -10, 0]; // headphones are OFF the head here
 const VOLUME_STEPS = [50, 25]; // OS volume-slider positions, % of max
 const HEARING_TRIALS = 2;
 

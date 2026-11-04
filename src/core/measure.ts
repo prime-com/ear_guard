@@ -22,7 +22,7 @@ export const CLIP_PEAK = 0.9;
 /** Per-step (mic − played) may deviate this much from the others before we call it non-linear. */
 export const LINEARITY_TOL_DB = 2;
 /** Stop raising the test level once the mic reads louder than this (dBFS). Clipping is checked separately via CLIP_PEAK. */
-export const MIC_CEILING_DBFS = -20;
+export const MIC_CEILING_DBFS = -10;
 /**
  * Loudest background the test can work with: a tone must reach MIN_SNR_DB above the room
  * noise without passing the mic ceiling. Derived, not tuned — a mic's raw level differs by
