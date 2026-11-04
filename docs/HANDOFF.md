@@ -184,6 +184,12 @@ milestone 3 against a reference.
    (iPhone Hearing readout, a meter, feel)? Proposed fix: a "measure my volume steps" mode in the
    Mac app (tone + built-in mic, user steps the volume keys; relative dB only, so mic sensitivity
    cancels) to build a real slider→dB table per device. Resume this after the iPhone test.
+   **iPhone (user request 2026-11-04): "what we have on Mac on iPhone, free, maybe Expo Go".**
+   Answer + build: see `docs/PLAN.md` §3c. Live capture is impossible on iOS; Expo Go can't read
+   HealthKit; native HealthKit realistically needs Xcode + $99/yr. Built the free route
+   `health.html` (Health export → weekly dose, local only). **Next: user tries it with a real
+   Health export on the iPhone** and reports problems (e.g. huge file memory, date formats,
+   Files app auto-unzipping, no headphone records because Headphone Audio Levels is off).
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.

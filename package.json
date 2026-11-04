@@ -18,5 +18,8 @@
     "vitest": "^2.1.8"
   },
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "fflate": "^0.8.3"
+  }
 }

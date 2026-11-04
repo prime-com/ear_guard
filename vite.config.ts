@@ -19,6 +19,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
         calibrate: resolve(__dirname, "calibrate.html"),
+        health: resolve(__dirname, "health.html"),
       },
     },
   },

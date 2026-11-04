@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EarGuard Health</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Your listening dose <small>from Apple Health</small></h1>
+      <p class="muted">
+        iPhone and Apple Watch already measure how loud your headphones are and keep it in the Health app. This page reads
+        that data from a file you export and shows how much of the WHO weekly safe-listening limit (80 dB(A) × 40 h) you've used.
+      </p>
+      <p class="banner"><b>Private:</b> the file is read inside this browser tab. Nothing is uploaded, and nothing is stored.</p>
+
+      <section>
+        <h2>1 · Export from Health</h2>
+        <ol>
+          <li>Open the <b>Health</b> app and tap your <b>profile picture</b> (top right).</li>
+          <li>Tap <b>Export All Health Data</b> and wait (it can take a minute or two).</li>
+          <li>Choose <b>Save to Files</b>.</li>
+        </ol>
+        <p class="muted">The export contains all your Health data. It never leaves your phone unless you share it.</p>
+      </section>
+
+      <section>
+        <h2>2 · Open the file here</h2>
+        <label>Export file (export.zip, or export.xml if Files already unzipped it)
+          <input id="file" type="file" accept=".zip,.xml,application/zip,text/xml,application/xml" />
+        </label>
+        <label><input id="sensitive" type="checkbox" /> Sensitive listener (75 dB(A) limit instead of 80)</label>
+        <div class="meter" id="progWrap" hidden><div id="prog"></div></div>
+        <p id="status" class="muted"></p>
+        <p id="err" class="warn" hidden></p>
+      </section>
+
+      <section id="result" hidden>
+        <h2>3 · Last 7 days</h2>
+        <p class="big" id="pctBig">—</p>
+        <p id="pctLine"></p>
+        <p id="avgLine" class="muted"></p>
+        <p id="staleLine" class="warn" hidden></p>
+        <h3>Day by day</h3>
+        <div id="days"></div>
+        <p class="muted" id="sourceNote">
+          Levels come from Apple Health. They're most accurate for Apple and Beats headphones; for other headphones iOS estimates
+          them from the volume setting. Time with no headphones connected isn't counted.
+        </p>
+      </section>
+
+      <p class="muted"><a href="./">← Back to the Lab</a> · <a href="./calibrate.html">Hearing check</a></p>
+      <p class="muted" id="build"></p>
+    </main>
+    <script type="module" src="/src/health.ts"></script>
+  </body>
+</html>

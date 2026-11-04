@@ -93,7 +93,7 @@ contributor measurement tools.
 |---|---|---|
 | 1 | **Mac menu bar** | System output level + output volume + device identity via Core Audio (**spike first**, see M3) |
 | 2 | Windows tray / Android | Same idea per platform |
-| 3 | iPhone | Apple Health only |
+| 3 | iPhone | Apple Health only. **Free route first:** `health.html` reads an "Export All Health Data" file in the browser (see §3c). A native app reading HealthKit live needs full Xcode **and, in practice, the paid $99/yr Apple Developer Program** |
 
 The core math (`src/core/`) stays pure TypeScript. For native apps we **port it and share
 test vectors** (JSON input/output pairs) so every port is checked against the same
@@ -144,6 +144,25 @@ EarPods ≈ 111 dB from Apple Health on an iPhone, source-dependent) and to lean
 and warns above 85 dB(A); converting that to a full-scale-sine figure was not possible from
 published sources, so it was NOT used. The UI labels everything "rough estimate". Replace with
 verified data in M6.
+
+### 3c. iPhone — decision and what exists (2026-11-04)
+
+The user asked for "what we have on the Mac" on iPhone, free, ideally via Expo Go. Findings:
+- iOS forbids any app from capturing other apps' audio, so the Mac approach (tap + volume) cannot
+  exist on iPhone. iPhone/Watch measure headphone loudness themselves → Apple Health
+  (`HKQuantityTypeIdentifierHeadphoneAudioExposure`, dB(A); most accurate for Apple/Beats, estimated
+  from volume for other headphones).
+- **Expo Go cannot read HealthKit** (native module); a development build is needed, which needs Xcode.
+  Free Apple ID "Personal Team" generally cannot sign the HealthKit capability (sources agree except
+  one blog; community sideload workarounds exist but are fragile); EAS iOS builds need the paid
+  program. So a live native HealthKit app = Xcode + $99/yr in practice.
+- **Built instead (free, no app, no install): `health.html`.** The user exports Health data
+  (Health → profile → Export All Health Data → Save to Files), opens `export.zip`/`export.xml` in the
+  page; it streams the file locally (fflate unzip + a chunk-safe scanner, `src/core/health.ts`), and
+  shows the last 7 days' dose vs the WHO limit (80 or 75 dB(A) × 40 h), average level, hours, and a
+  per-day breakdown. Nothing is uploaded or stored. Verified end to end in headless Chromium against
+  an independently computed answer (26 MB export, 120 k unrelated records). **Not yet tried with a
+  real iPhone export.** Not live: needs a fresh export each time.
 
 ### Volume curve
 Slider position → dB is not linear and differs per OS and, for Bluetooth, per device

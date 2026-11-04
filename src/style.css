@@ -29,3 +29,7 @@ input[type="text"] { font: inherit; padding: 6px 8px; width: 100%; max-width: 36
 .saved li { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--line); }
 details pre { max-height: 300px; }
 #micErr, #volErr { white-space: pre-line; }
+.dayrow { margin: 8px 0; font-size: 0.9rem; }
+.daybar { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; margin-top: 3px; }
+.daybar > div { height: 100%; background: var(--accent); }
+h3 { font-size: 0.95rem; margin: 16px 0 4px; }
