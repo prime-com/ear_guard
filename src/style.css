@@ -28,3 +28,4 @@ input[type="text"] { font: inherit; padding: 6px 8px; width: 100%; max-width: 36
 .saved { list-style: none; padding: 0; }
 .saved li { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid var(--line); }
 details pre { max-height: 300px; }
+#micErr, #volErr { white-space: pre-line; }

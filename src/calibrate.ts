@@ -11,6 +11,7 @@ import {
   CLIP_PEAK,
   MIC_CEILING_DBFS,
   ROOM_MAX_DBFS,
+  MIN_SNR_DB,
   ROOM_MAX_SPREAD_DB,
   summarizeHearing,
   volumeStep,
@@ -32,7 +33,7 @@ type Mode = "full" | "hearing";
 type Step = "setup" | "room" | "mic" | "volume" | "hearing" | "result";
 
 /** Levels (dBFS) of the rising 1 kHz tone in the mic test. The loop stops early if the mic gets loud or clips. */
-const MIC_TEST_LEVELS = [-60, -50, -40, -30, -20];
+const MIC_TEST_LEVELS = [-60, -50, -40, -30, -20, -10]; // headphones are OFF the head here
 const VOLUME_STEPS = [50, 25]; // OS volume-slider positions, % of max
 const HEARING_TRIALS = 2;
 
@@ -218,7 +219,10 @@ $("micGo").addEventListener("click", async () => {
   S.micResult = r;
   if (!r.ok) {
     setText("micStatus", "");
-    setText("micErr", MIC_PROBLEMS[r.problem!]);
+    const detail = r.steps
+      .map((st) => `tone ${st.playedDbfs} → mic ${st.micDbfs.toFixed(1)} dBFS, ${Number.isFinite(st.snrDb) ? st.snrDb.toFixed(0) : "<0"} dB above room${st.usable ? " ✓" : ` (${st.issue})`}`)
+      .join("\n");
+    setText("micErr", `${MIC_PROBLEMS[r.problem!]}\n\nRoom ${S.noiseDbfs.toFixed(1)} dBFS. Each tone needs ${MIN_SNR_DB} dB above it; at least 2 must pass.\n${detail}`);
     show("micErr");
     return;
   }
