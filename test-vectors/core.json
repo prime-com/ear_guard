@@ -1,0 +1,211 @@
+{
+ "_about": "Generated from src/core/calibration.ts. Both the TypeScript and Swift ports must reproduce these. Regenerate only when the maths intentionally changes.",
+ "dbToPa2": [
+  {
+   "db": 60,
+   "pa2": 0.0004
+  },
+  {
+   "db": 70,
+   "pa2": 0.004000000000000001
+  },
+  {
+   "db": 75,
+   "pa2": 0.012649110640673523
+  },
+  {
+   "db": 80,
+   "pa2": 0.04000000000000001
+  },
+  {
+   "db": 83,
+   "pa2": 0.07981049259875533
+  },
+  {
+   "db": 85,
+   "pa2": 0.1264911064067352
+  },
+  {
+   "db": 90,
+   "pa2": 0.4
+  },
+  {
+   "db": 100,
+   "pa2": 4
+  }
+ ],
+ "exposurePa2h": [
+  {
+   "db": 80,
+   "seconds": 3600,
+   "pa2h": 0.04000000000000001
+  },
+  {
+   "db": 80,
+   "seconds": 144000,
+   "pa2h": 1.6000000000000003
+  },
+  {
+   "db": 90,
+   "seconds": 1800,
+   "pa2h": 0.2
+  },
+  {
+   "db": 100,
+   "seconds": 60,
+   "pa2h": 0.06666666666666667
+  }
+ ],
+ "weeklyDoseFraction": [
+  {
+   "pa2h": 0.4,
+   "mode": "standard",
+   "fraction": 0.25
+  },
+  {
+   "pa2h": 0.4,
+   "mode": "sensitive",
+   "fraction": 0.7843137254901961
+  },
+  {
+   "pa2h": 1.6,
+   "mode": "standard",
+   "fraction": 1
+  },
+  {
+   "pa2h": 1.6,
+   "mode": "sensitive",
+   "fraction": 3.1372549019607843
+  },
+  {
+   "pa2h": 3.2,
+   "mode": "standard",
+   "fraction": 2
+  },
+  {
+   "pa2h": 3.2,
+   "mode": "sensitive",
+   "fraction": 6.2745098039215685
+  }
+ ],
+ "allowedHoursPerWeek": [
+  {
+   "db": 60,
+   "mode": "standard",
+   "hours": 4000
+  },
+  {
+   "db": 60,
+   "mode": "sensitive",
+   "hours": 1275
+  },
+  {
+   "db": 70,
+   "mode": "standard",
+   "hours": 399.99999999999994
+  },
+  {
+   "db": 70,
+   "mode": "sensitive",
+   "hours": 127.49999999999997
+  },
+  {
+   "db": 75,
+   "mode": "standard",
+   "hours": 126.49110640673513
+  },
+  {
+   "db": 75,
+   "mode": "sensitive",
+   "hours": 40.31904016714682
+  },
+  {
+   "db": 80,
+   "mode": "standard",
+   "hours": 39.99999999999999
+  },
+  {
+   "db": 80,
+   "mode": "sensitive",
+   "hours": 12.749999999999998
+  },
+  {
+   "db": 83,
+   "mode": "standard",
+   "hours": 20.047489345090856
+  },
+  {
+   "db": 83,
+   "mode": "sensitive",
+   "hours": 6.39013722874771
+  },
+  {
+   "db": 85,
+   "mode": "standard",
+   "hours": 12.649110640673516
+  },
+  {
+   "db": 85,
+   "mode": "sensitive",
+   "hours": 4.031904016714683
+  },
+  {
+   "db": 90,
+   "mode": "standard",
+   "hours": 4
+  },
+  {
+   "db": 90,
+   "mode": "sensitive",
+   "hours": 1.275
+  },
+  {
+   "db": 100,
+   "mode": "standard",
+   "hours": 0.4
+  },
+  {
+   "db": 100,
+   "mode": "sensitive",
+   "hours": 0.1275
+  }
+ ],
+ "earLevelDb": [
+  {
+   "signalDbA": -15,
+   "volumeDb": -6,
+   "sDevice": 100,
+   "db": 79
+  },
+  {
+   "signalDbA": -20,
+   "volumeDb": -17.2,
+   "sDevice": 111,
+   "db": 73.8
+  },
+  {
+   "signalDbA": -30,
+   "volumeDb": 0,
+   "sDevice": 90,
+   "db": 60
+  }
+ ],
+ "rmsToDbfs": [
+  {
+   "rms": 0.7071067811865476,
+   "dbfs": 1.928654933106574e-15
+  },
+  {
+   "rms": 0.1,
+   "dbfs": -16.989700043360187
+  },
+  {
+   "rms": 0.01,
+   "dbfs": -36.98970004336019
+  },
+  {
+   "rms": 1,
+   "dbfs": 3.010299956639812
+  }
+ ]
+}

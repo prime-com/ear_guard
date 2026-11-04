@@ -169,8 +169,13 @@ milestone 3 against a reference.
    `spike/mac-audio/`). A native Mac app can read the device name/type, the volume slider and
    the pre-volume system audio level. Capture needs the "System Audio Recording" permission
    (silent zeros without it). The user ran it from Terminal after enabling that permission.
-2. M4: Mac menu-bar app with the cautious estimate + dose tracking (port `src/core/`;
-   share JSON test vectors between TypeScript and Swift).
+2. **M4 — Mac menu-bar app: BUILT** (`app/mac/`, see `docs/PLAN.md` §3b). Self-tested (66 checks
+   + cross-language test vectors) and the headless engine runs; **never run with real music for
+   a day, and the menu-bar UI has never been looked at by a human**. To try it:
+   `cd app/mac && ./build-app.sh && open build/EarGuard.app`, then enable the app in System
+   Settings → Privacy & Security → Screen & System Audio Recording → "System Audio Recording
+   Only", quit and reopen it. `swift run EarGuardSelfTest` re-runs the checks.
+   The layer-3 default (100 ± 10 dB, slider = 20·log10) is an unverified loud-leaning placeholder.
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.

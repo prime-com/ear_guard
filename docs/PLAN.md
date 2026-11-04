@@ -123,6 +123,28 @@ Findings that shape the app:
 - Still to check later: per-app audio, multi-output setups, device switches while running,
   sleep/wake, an Info.plist-bundled app (the spike is a bare executable).
 
+### 3b. M4 — what was built (`app/mac/`, Swift package, no Xcode needed)
+
+- `EarGuardCore` (pure): dose maths, `AWeightingFilter` (IEC 61672, bilinear, within 0.7 dB of the
+  standard table), `LevelMeter` (per-channel, **loudest channel wins**), `DoseStore` (15-minute
+  buckets, rolling 7 days, `~/Library/Application Support/EarGuard/dose.json`), `estimateLevel`.
+- `EarGuardMac`: Core Audio tap + output info + `Tracker` + menu-bar UI. `--print N` runs the engine
+  headless. `./build-app.sh` makes an ad-hoc-signed `build/EarGuard.app` with
+  `NSAudioCaptureUsageDescription` (the app gets its own "System Audio Recording" entry).
+- `EarGuardSelfTest`: `swift run EarGuardSelfTest` — 66 checks incl. `test-vectors/core.json`,
+  which is **generated from the TypeScript** and verified by both languages.
+- Counted toward dose: Bluetooth, USB, headphone jack. Not counted: built-in speakers, HDMI/display,
+  AirPlay. Volume unknown → assume max (loud side). Dose accumulates `estimate + 1σ`.
+
+**Layer-3 default is an UNVERIFIED PLACEHOLDER** (`Estimate.swift`): `S_default = 100 ± 10 dB`
+(full-scale tone at max volume) and slider→dB = `20·log10(slider)` ± 6 dB. They were chosen only to
+span the two reference points we have (Sony ≈ 85–88 dB from the hearing check, which reads low;
+EarPods ≈ 111 dB from Apple Health on an iPhone, source-dependent) and to lean loud. Research
+(2026-11-04): EN 50332 caps player output at 100 dB(A) **for its own programme-noise test signal**
+and warns above 85 dB(A); converting that to a full-scale-sine figure was not possible from
+published sources, so it was NOT used. The UI labels everything "rough estimate". Replace with
+verified data in M6.
+
 ### Volume curve
 Slider position → dB is not linear and differs per OS and, for Bluetooth, per device
 (absolute volume). Measured once: Mac slider at 50 % ≈ −17 dB on the Sony. The apps need a
@@ -137,7 +159,7 @@ per-platform mapping, ideally from reading the actual device gain rather than th
 | M1 | Web prototype & Bluetooth-mic test | ✅ done (Android untested) |
 | M2 | Guided calibration flow | ✅ built and run end to end; **retired as main path** |
 | ✅ **M3** | **Mac spike (DONE 2026-11-04, see §3a):** can a native Mac app get (a) the system output signal level, (b) the output volume or gain, (c) the output device name, for Bluetooth and wired? Write down what needs permissions | A short written result + a tiny working prototype |
-| M4 | Mac menu-bar app: live dB from layer 3 + dose tracking, local only | Runs for a day without crashing; dose matches hand calculation |
+| 🟡 **M4** | **Mac menu-bar app** (`app/mac/`): live dB from layer 3 + dose tracking, local only. **Built and self-tested (66 checks); not yet run for a day with real music** | Runs for a day without crashing; dose matches hand calculation |
 | M5 | Database format + schema CI + first entries (needs a measurement rig or a collaborator who has one) | ≥ 5 models measured with published method |
 | M6 | Verify the layer-3 default against standards and the first measurements; publish error data | Written accuracy report |
 | M7 | Windows / Android | — |
