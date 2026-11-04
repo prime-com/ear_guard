@@ -15,7 +15,16 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - name: Unit tests (shared vectors)
-        run: dotnet test app/windows/EarGuardCore.Tests -c Release
+        shell: pwsh
+        run: |
+          dotnet test app/windows/EarGuardCore.Tests -c Release 2>&1 | Tee-Object -FilePath test.log
+          $code = $LASTEXITCODE
+          if ($code -ne 0) {
+            # surface the first problems as annotations so they are readable without logging in
+            $lines = Select-String -Path test.log -Pattern 'error |Failed |Assert|expected|Message' | Select-Object -First 12 | ForEach-Object { $_.Line.Trim() }
+            Write-Output "::error::$($lines -join '%0A')"
+          }
+          exit $code
       - name: Publish single-file exe
         run: dotnet publish app/windows/EarGuardWin -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
       # Private: only people with access to the repo's Actions tab can download this.
