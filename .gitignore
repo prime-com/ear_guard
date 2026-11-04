@@ -4,3 +4,5 @@ dist/
 *.log
 .build/
 app/mac/build/
+spike/win-audio/bin/
+spike/win-audio/obj/
