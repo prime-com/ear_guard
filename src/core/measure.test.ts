@@ -4,6 +4,9 @@ import {
   analyzeMicTest,
   checkRoom,
   energyMeanDb,
+  MIC_CEILING_DBFS,
+  MIN_SNR_DB,
+  ROOM_MAX_DBFS,
   subtractNoise,
   summarizeBlock,
   summarizeHearing,
@@ -26,7 +29,14 @@ describe("room check", () => {
     expect(checkRoom({ dbfs: -70, peak: 0.01, spreadDb: 2 }).ok).toBe(true);
   });
   it("rejects a loud room", () => {
-    expect(checkRoom({ dbfs: -45, peak: 0.1, spreadDb: 2 }).problem).toBe("too-loud");
+    expect(checkRoom({ dbfs: -30, peak: 0.1, spreadDb: 2 }).problem).toBe("too-loud");
+  });
+  it("accepts the ordinary daytime floors measured on a MacBook (Chrome −42, Safari −51)", () => {
+    expect(checkRoom({ dbfs: -42, peak: 0.05, spreadDb: 7.6 }).ok).toBe(true);
+    expect(checkRoom({ dbfs: -51, peak: 0.05, spreadDb: 3 }).ok).toBe(true);
+  });
+  it("derives its limit from what a 15 dB-SNR tone needs", () => {
+    expect(ROOM_MAX_DBFS).toBe(MIC_CEILING_DBFS - MIN_SNR_DB);
   });
   it("rejects fluctuating noise such as speech", () => {
     expect(checkRoom({ dbfs: -65, peak: 0.1, spreadDb: 15 }).problem).toBe("unsteady");

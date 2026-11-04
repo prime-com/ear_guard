@@ -121,14 +121,16 @@ Choices made while building it (change if the real-hardware run says so):
   2.6 dB apart (consistent) → S_device ≈ 85 ± 5 dB, dose value 90 dB, confidence
   "hearing-only". Unverified: not known whether volume was at max; hearing-only reads low by
   design; no reference to compare with yet. Saved as "Unnamed headphones" (name left empty).
-- **OPEN ISSUE — room check rejects a quiet room.** The full test could not get past the room
-  check at 3 am in a quiet room. Cause unknown. Suspects: `ROOM_MAX_DBFS = −55` is too strict
-  for the MacBook mic's own noise floor (earlier Lab readings of the room were −66…−70
-  dBFS, but those used other mics), or `ROOM_MAX_SPREAD_DB = 8` trips on a fluctuating floor
-  (e.g. Mac fan/auto level). The failure message now prints the measured level, swing and
-  limits — **read those numbers first**, then set the thresholds from real data (don't just
-  loosen them blindly; the room check exists so the mic test isn't drowned in noise, and the
-  mic test has its own per-step SNR gate of 15 dB).
+- **Room check rejected a quiet room — diagnosed, fix pushed (needs a real-hardware re-test).**
+  Measured with the Lab meter, silent room, MacBook built-in mic: Chrome −42…−47 dBFS,
+  Safari −50.8 dBFS by day, versus Safari −70 dBFS at 2 am. DC offset is only −86 dBFS, so it
+  was not DC (DC is still removed from levels, which is correct anyway). The floor moves ~19 dB
+  with time of day and differs by browser, so the fixed −55 dBFS limit was the wrong rule.
+  Now `ROOM_MAX_DBFS = MIC_CEILING_DBFS − MIN_SNR_DB = −35` (derived: a tone must reach 15 dB
+  above the noise without passing the mic ceiling, now −20 dBFS), swing limit 10 dB. Accuracy
+  is still protected by the per-step SNR gate + noise subtraction in `analyzeMicTest`.
+  Watch for: if the floor is high the top mic-test steps may fail "too quiet" — that is the
+  honest outcome; consider a tighter coupling (earcup sealed on the mic) or a quieter time.
 - Was the run on Mac or iPhone, and was volume at max? Not confirmed with the user.
 
 ## NEXT STEPS (pick up here)

@@ -11,10 +11,8 @@ import {
   type HeadphoneType,
 } from "./calibration";
 
-/** Room is "too loud" if the mic's background level is above this (dBFS, heuristic). */
-export const ROOM_MAX_DBFS = -55;
 /** Background that swings more than this over the check is speech/music, not steady noise. */
-export const ROOM_MAX_SPREAD_DB = 8;
+export const ROOM_MAX_SPREAD_DB = 10;
 /** Below this the mic is effectively muted or disconnected. */
 export const MIC_DEAD_DBFS = -110;
 /** A test tone must stand this far above the room noise at the mic to be used. */
@@ -23,8 +21,14 @@ export const MIN_SNR_DB = 15;
 export const CLIP_PEAK = 0.9;
 /** Per-step (mic − played) may deviate this much from the others before we call it non-linear. */
 export const LINEARITY_TOL_DB = 2;
-/** Stop raising the test level once the mic reads louder than this (dBFS). */
-export const MIC_CEILING_DBFS = -30;
+/** Stop raising the test level once the mic reads louder than this (dBFS). Clipping is checked separately via CLIP_PEAK. */
+export const MIC_CEILING_DBFS = -20;
+/**
+ * Loudest background the test can work with: a tone must reach MIN_SNR_DB above the room
+ * noise without passing the mic ceiling. Derived, not tuned — a mic's raw level differs by
+ * browser, input-volume setting and time of day (measured: −70 dBFS at night, −51 by day).
+ */
+export const ROOM_MAX_DBFS = MIC_CEILING_DBFS - MIN_SNR_DB;
 /** A "lower" volume step that reads louder than max by more than this means the volume wasn't lowered. */
 export const VOLUME_NOT_LOWER_DB = 1.5;
 /** Two hearing trials further apart than this are flagged inconsistent. */
