@@ -176,6 +176,14 @@ milestone 3 against a reference.
    Settings → Privacy & Security → Screen & System Audio Recording → "System Audio Recording
    Only", quit and reopen it. `swift run EarGuardSelfTest` re-runs the checks.
    The layer-3 default (100 ± 10 dB, slider = 20·log10) is an unverified loud-leaning placeholder.
+   **ON HOLD (user, 2026-11-04): Mac app accuracy.** User played the same audio on Sony/Mac and the
+   app showed ≈85 dB at 100 %, ≈75 dB at 50 %, ≈65 dB at 20 %, and said "it aint accurate" without
+   naming a reference. Known causes: placeholder 100 dB S_default and the assumed slider curve
+   (20·log10) — one real point says 50 % ≈ −17 dB vs the assumed ≈ −7 dB, so low volumes read too
+   loud (left deliberately on the loud side). Open question to the user: accurate compared to what
+   (iPhone Hearing readout, a meter, feel)? Proposed fix: a "measure my volume steps" mode in the
+   Mac app (tone + built-in mic, user steps the volume keys; relative dB only, so mic sensitivity
+   cancels) to build a real slider→dB table per device. Resume this after the iPhone test.
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.
