@@ -190,6 +190,14 @@ milestone 3 against a reference.
    `health.html` (Health export → weekly dose, local only). **Next: user tries it with a real
    Health export on the iPhone** and reports problems (e.g. huge file memory, date formats,
    Files app auto-unzipping, no headphone records because Headphone Audio Levels is off).
+   **INCIDENT 2026-11-04: the running Mac app made the Sony sound like a phone call (call mode / HFP).**
+   Suspected cause (NOT proven — a probe of `DeviceIsRunningSomewhere` was inconclusive): the tap's
+   aggregate device included the Bluetooth output as a sub-device, which also carries the headset's mic
+   stream. Fix pushed: `ClockMode` in `CoreAudioSupport.swift` — default `builtin` (Mac speakers provide the
+   clock; Bluetooth never in the aggregate); `EARGUARD_CLOCK=none|output` for testing (`output` = old
+   behaviour). **Needs the user to confirm** that music stays normal with the new default AND that levels
+   are non-silent (a tap with a different clock source might deliver silence — untested with permission).
+   If `builtin` is silent, try `none`. Never ship a version that switches Bluetooth to call mode.
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.

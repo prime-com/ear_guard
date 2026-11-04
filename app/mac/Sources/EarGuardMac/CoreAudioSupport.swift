@@ -70,3 +70,44 @@ func readOutputInfo(_ dev: AudioObjectID) -> OutputInfo {
                       isHeadphones: countsAsHeadphones(transport: transport, dataSource: source),
                       volume: volume, muted: muted)
 }
+
+func allAudioDevices() -> [AudioObjectID] {
+    var a = addr(kAudioHardwarePropertyDevices)
+    var size: UInt32 = 0
+    guard AudioObjectGetPropertyDataSize(systemObject, &a, 0, nil, &size) == noErr else { return [] }
+    var ids = [AudioObjectID](repeating: 0, count: Int(size) / MemoryLayout<AudioObjectID>.size)
+    guard AudioObjectGetPropertyData(systemObject, &a, 0, nil, &size, &ids) == noErr else { return [] }
+    return ids
+}
+
+func outputChannelCount(_ dev: AudioObjectID) -> Int {
+    var a = addr(kAudioDevicePropertyStreamConfiguration, kAudioDevicePropertyScopeOutput, 0)
+    var size: UInt32 = 0
+    guard AudioObjectGetPropertyDataSize(dev, &a, 0, nil, &size) == noErr, size > 0 else { return 0 }
+    let buf = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: 16)
+    defer { buf.deallocate() }
+    guard AudioObjectGetPropertyData(dev, &a, 0, nil, &size, buf) == noErr else { return 0 }
+    return UnsafeMutableAudioBufferListPointer(buf.assumingMemoryBound(to: AudioBufferList.self)).reduce(0) { $0 + Int($1.mNumberChannels) }
+}
+
+/// UID of a built-in output device (the Mac's own speakers), or nil.
+func builtInOutputUID() -> String? {
+    for id in allAudioDevices() where outputChannelCount(id) > 0 {
+        let transport = fourCC(getProperty(id, addr(kAudioDevicePropertyTransportType), UInt32(0)) ?? 0)
+        if transport == "bltn" { return getProperty(id, addr(kAudioDevicePropertyDeviceUID), "" as CFString) as String? }
+    }
+    return nil
+}
+
+/// Which device provides the clock for the tap's aggregate device.
+///
+/// Why this matters: an aggregate that contains a Bluetooth headset also contains its microphone
+/// stream, and running it can switch the headset into call mode (HFP) — music turns quiet and
+/// "phone-like". `builtin` (default) keeps the Bluetooth device out of the aggregate entirely.
+enum ClockMode: String {
+    case builtin  // default: the Mac's own speakers provide the clock
+    case none     // tap only, no sub-device
+    case output   // the default output device (old behaviour; can trigger call mode on Bluetooth)
+
+    static var current: ClockMode { ProcessInfo.processInfo.environment["EARGUARD_CLOCK"].flatMap(ClockMode.init) ?? .builtin }
+}

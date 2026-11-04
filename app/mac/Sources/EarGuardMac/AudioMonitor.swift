@@ -79,16 +79,26 @@ final class AudioMonitor {
         var st = AudioHardwareCreateProcessTap(desc, &tapID)
         guard st == noErr else { throw TapError.failed("Creating the audio tap", st) }
 
-        let agg: [String: Any] = [
+        var agg: [String: Any] = [
             kAudioAggregateDeviceNameKey: "EarGuardTap",
             kAudioAggregateDeviceUIDKey: UUID().uuidString,
-            kAudioAggregateDeviceMainSubDeviceKey: outputUID,
             kAudioAggregateDeviceIsPrivateKey: true,
             kAudioAggregateDeviceIsStackedKey: false,
             kAudioAggregateDeviceTapAutoStartKey: true,
-            kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: outputUID]],
             kAudioAggregateDeviceTapListKey: [[kAudioSubTapUIDKey: desc.uuid.uuidString, kAudioSubTapDriftCompensationKey: true]],
         ]
+        // Keep Bluetooth devices out of the aggregate (see ClockMode).
+        let clockUID: String?
+        switch ClockMode.current {
+        case .builtin: clockUID = builtInOutputUID()
+        case .output: clockUID = outputUID
+        case .none: clockUID = nil
+        }
+        if let clockUID {
+            agg[kAudioAggregateDeviceMainSubDeviceKey] = clockUID
+            agg[kAudioAggregateDeviceSubDeviceListKey] = [[kAudioSubDeviceUIDKey: clockUID]]
+        }
+        print("tap clock: \(ClockMode.current.rawValue) \(clockUID ?? "(none)")")
         st = AudioHardwareCreateAggregateDevice(agg as CFDictionary, &aggID)
         guard st == noErr else { throw TapError.failed("Creating the aggregate device", st) }
 
