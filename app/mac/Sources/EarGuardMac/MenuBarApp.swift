@@ -22,7 +22,12 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
     private let pauseItem = NSMenuItem(title: "Pause tracking", action: #selector(togglePause), keyEquivalent: "")
     private let sensitiveItem = NSMenuItem(title: "Sensitive listener (75 dB limit)", action: #selector(toggleSensitive), keyEquivalent: "")
 
+    private let defaults = UserDefaults.standard
+
     func applicationDidFinishLaunching(_ notification: Notification) {
+        // remembered between launches
+        tracker.mode = defaults.string(forKey: "mode") == "sensitive" ? .sensitive : .standard
+        tracker.paused = defaults.bool(forKey: "paused")
         statusItem.button?.title = "🎧"
         let menu = NSMenu()
         headerItem.title = "EarGuard — rough estimate"
@@ -60,7 +65,7 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
 
     private func refresh() {
         let week = tracker.weekFraction()
-        let warn = week >= 1 ? " ⚠︎" : ""
+        let warn = (week >= 1 ? " ⚠︎" : "") + (tracker.paused ? " ⏸" : "")
         deviceItem.title = lastOutput.map { "Output: \($0.name) (\($0.transportLabel))" } ?? "Output: —"
         hintItem.isHidden = true
         allowedItem.isHidden = true
@@ -101,18 +106,44 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
         todayItem.title = "Today: \(pct(tracker.todayFraction())) of the weekly limit"
         weekItem.title = "Last 7 days: \(pct(week)) of the weekly limit (\(tracker.mode == .standard ? "80" : "75") dB(A) × 40 h)"
         pauseItem.title = tracker.paused ? "Resume tracking" : "Pause tracking"
+        pauseItem.state = tracker.paused ? .on : .off
+        if tracker.paused {
+            levelItem.title = "Paused — not counting.  " + levelItem.title
+        }
         sensitiveItem.state = tracker.mode == .sensitive ? .on : .off
     }
 
-    @objc private func togglePause() { tracker.paused.toggle(); refresh() }
-    @objc private func toggleSensitive() { tracker.mode = tracker.mode == .standard ? .sensitive : .standard; refresh() }
+    @objc private func togglePause() {
+        tracker.paused.toggle()
+        defaults.set(tracker.paused, forKey: "paused")
+        refresh()
+    }
 
+    @objc private func toggleSensitive() {
+        tracker.mode = tracker.mode == .standard ? .sensitive : .standard
+        defaults.set(tracker.mode == .sensitive ? "sensitive" : "standard", forKey: "mode")
+        refresh()
+    }
+
+    /// "System Audio Recording" lives under Privacy & Security → "Screen & System Audio Recording" on current
+    /// macOS. Try that pane first, then older anchors, then plain System Settings.
     @objc private func openPermissionSettings() {
-        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AudioCapture")!)
+        let candidates = [
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture",
+            "x-apple.systempreferences:com.apple.preference.security?Privacy_AudioCapture",
+            "x-apple.systempreferences:com.apple.preference.security",
+        ]
+        for c in candidates {
+            if let url = URL(string: c), NSWorkspace.shared.open(url) { return }
+        }
+        NSWorkspace.shared.open(URL(fileURLWithPath: "/System/Applications/System Settings.app"))
     }
 
     @objc private func showAbout() {
+        // A menu-bar-only app is not frontmost, so bring it forward or the window opens hidden behind others.
+        NSApp.activate(ignoringOtherApps: true)
         let a = NSAlert()
+        a.addButton(withTitle: "OK")
         a.messageText = "A rough estimate, not a measurement"
         a.informativeText = """
         EarGuard hears what your Mac plays and combines it with the volume setting and an assumed headphone loudness (100 dB ± 10 for a full-scale tone). That assumption is a placeholder that leans loud — it is not measured for your headphones, and the volume-slider curve is also assumed.
