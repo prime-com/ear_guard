@@ -55,6 +55,15 @@ describe("noise handling", () => {
   it("returns null when the reading is not above the noise", () => {
     expect(subtractNoise(-70, -68)).toBeNull();
   });
+  it("a single click does not make a steady room look unsteady", () => {
+    const readings = Array.from({ length: 40 }, (_, i) => -50 + (i % 3) * 0.5);
+    readings[2] = -30; // trackpad click
+    expect(checkRoom(summarizeBlock(readings, 0.1)).ok).toBe(true);
+  });
+  it("sustained speech-like swings are still caught", () => {
+    const readings = Array.from({ length: 40 }, (_, i) => (i % 2 ? -50 : -36));
+    expect(checkRoom(summarizeBlock(readings, 0.1)).problem).toBe("unsteady");
+  });
   it("summarizes readings with an energy mean", () => {
     const b = summarizeBlock([-60, -60, -54], 0.2);
     expect(b.dbfs).toBeGreaterThan(-58);

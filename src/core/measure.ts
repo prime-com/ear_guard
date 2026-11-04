@@ -48,12 +48,20 @@ export interface Block {
   spreadDb: number; // max − min of the per-reading levels
 }
 
+/** Nearest-rank percentile of a sorted array. */
+const pct = (sorted: number[], p: number, up: boolean) =>
+  sorted[Math.max(0, Math.min(sorted.length - 1, (up ? Math.ceil : Math.floor)(p * (sorted.length - 1))))];
+
+/**
+ * Spread is the 10th–90th percentile range, not max − min: one click (trackpad, keyboard)
+ * shouldn't mark a steady room as unsteady. Sustained speech/music still widens it.
+ */
 export function summarizeBlock(readings: number[], peak: number): Block {
-  const finite = readings.filter(Number.isFinite);
+  const finite = readings.filter(Number.isFinite).sort((a, b) => a - b);
   return {
     dbfs: energyMeanDb(readings),
     peak,
-    spreadDb: finite.length ? Math.max(...finite) - Math.min(...finite) : 0,
+    spreadDb: finite.length ? pct(finite, 0.9, true) - pct(finite, 0.1, false) : 0,
   };
 }
 

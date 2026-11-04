@@ -144,6 +144,10 @@ async function runRoom() {
   if (!mic) return;
   show("roomRetry", false);
   show("roomNext", false);
+  show("roomAnyway", false);
+  setText("roomStatus", "Hands off the keyboard and trackpad…");
+  await new Promise((res) => setTimeout(res, 1500)); // don't record the click that started this
+  if (!mic) return;
   setText("roomStatus", "Listening… stay quiet.");
   const r = checkRoom(await measureFor(mic, 4000));
   S.noiseDbfs = r.noiseDbfs;
@@ -157,10 +161,14 @@ async function runRoom() {
       `${ROOM_MESSAGES[r.problem!]} (Measured ${r.noiseDbfs.toFixed(1)} dBFS, swing ${r.spreadDb.toFixed(1)} dB; limits are ${ROOM_MAX_DBFS} dBFS and ${ROOM_MAX_SPREAD_DB} dB.)`,
     );
     show("roomRetry");
+    // Unsteady noise is safe to continue with: each mic-test tone must still clear the
+    // noise by MIN_SNR_DB, and leftover noise only makes the result read louder.
+    if (r.problem === "unsteady") show("roomAnyway");
   }
 }
 
 $("roomRetry").addEventListener("click", () => void runRoom());
+$("roomAnyway").addEventListener("click", () => $("roomNext").click());
 $("roomNext").addEventListener("click", async () => {
   const label = await defaultOutputLabel();
   setText("outInfo", label ? `Sound will play through: ${label}` : "");
