@@ -65,6 +65,7 @@ let agg: [String: Any] = [
     kAudioAggregateDeviceNameKey: "EarGuardSpike",
     kAudioAggregateDeviceUIDKey: aggUID,
     kAudioAggregateDeviceIsPrivateKey: true,
+    kAudioAggregateDeviceIsStackedKey: false,
     kAudioAggregateDeviceMainSubDeviceKey: uid,
     kAudioAggregateDeviceSubDeviceListKey: [[kAudioSubDeviceUIDKey: uid]],
     kAudioAggregateDeviceTapAutoStartKey: true,
@@ -83,6 +84,7 @@ if let f = get(tapID, addr(kAudioTapPropertyFormat), AudioStreamBasicDescription
 }
 
 var callbacks = 0
+var peakEver: Float = 0
 var sumSq = 0.0, count = 0.0, peak: Float = 0
 let lock = NSLock()
 var proc: AudioDeviceIOProcID?
@@ -109,6 +111,7 @@ for _ in 0..<Int(seconds) {
     let cb = callbacks
     let pk = peak
     sumSq = 0; count = 0; peak = 0
+    peakEver = max(peakEver, pk)
     lock.unlock()
     let dbfs = rms > 0 ? 20 * log10(rms * 2.0.squareRoot()) : -Double.infinity
     print(String(format: "    callbacks=%d  level=%.1f dBFS (AES17)  peak=%.4f", cb, dbfs, pk))
@@ -117,4 +120,8 @@ AudioDeviceStop(aggID, proc)
 AudioDeviceDestroyIOProcID(aggID, proc)
 AudioHardwareDestroyAggregateDevice(aggID)
 AudioHardwareDestroyProcessTap(tapID)
+if peakEver == 0 {
+    print("NOTE: all silence. If audio WAS playing, this is almost always the macOS privacy permission:")
+    print("      System Settings → Privacy & Security → Screen & System Audio Recording → enable the app running this (Terminal / VS Code).")
+}
 print("done")
