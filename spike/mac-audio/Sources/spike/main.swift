@@ -78,9 +78,8 @@ st = AudioHardwareCreateAggregateDevice(agg as CFDictionary, &aggID)
 print("    create aggregate device: status \(st)")
 guard st == noErr else { exit(3) }
 
-if var f = get(tapID, addr(kAudioTapPropertyFormat), AudioStreamBasicDescription()) {
+if let f = get(tapID, addr(kAudioTapPropertyFormat), AudioStreamBasicDescription()) {
     print("    tap format: \(f.mSampleRate) Hz, \(f.mChannelsPerFrame) ch, \(f.mBitsPerChannel) bit, flags \(f.mFormatFlags)")
-    f.mSampleRate = f.mSampleRate
 }
 
 var callbacks = 0
