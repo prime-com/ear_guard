@@ -1,7 +1,8 @@
 # EarGuard — context handoff
 
 Paste this to a fresh Claude session (VS Code extension, CLI, anywhere) to pick up
-where the project left off. Read `docs/PLAN.md` next — it holds the full plan and math.
+where the project left off. Read `docs/PLAN.md` next — it holds the v2 plan, the evidence
+behind it, and the math. (The milestone-1/2 sections below are history.)
 
 ## What this project is
 
@@ -14,17 +15,24 @@ Repo: https://github.com/prime-com/ear_guard · Owner: prime-com (Tanmay) · Lic
 
 ## Decisions already made — don't re-litigate these
 
+**Direction changed on 2026-11-04 (v2).** The user decided, after running the calibration
+flow on real hardware, that the per-user calibration test is too fiddly and too inaccurate
+to be the main path. Read `docs/PLAN.md` (v2) — it has the evidence and the new design.
+
 | Decision | Why |
 |---|---|
-| **Web app first**, then Mac → Windows/Android → iPhone last | iPhone needs a $99/yr dev account to test; the web runs from a link anywhere |
-| **Calibration is the hard part and comes first** | Everything else is easy once we know how loud a device gets |
+| **v2: three layers, best available wins — platform data → headphone database → cautious estimate** | Accuracy must come from measured data, not each user's laptop mic (mic level isn't portable: 35 dB error observed) |
+| **The per-user calibration test is retired as the main path** (code stays as a contributor measurement tool, page labelled experimental) | Too demanding for users; accuracy unproven |
+| **Next build is a native Mac menu-bar app, starting with a feasibility spike** | Browsers can't hear other apps' audio or read system volume |
 | **Must work for Bluetooth, not just wired** | Spec-sheet-only approaches were rejected for this reason |
-| **The "calibration network" idea (users loudness-matching between devices) was dropped** | Needs a large user base we don't have yet |
-| **Official-specs-only approach was dropped as the primary method** | Brands publish almost nothing usable for Bluetooth |
-| **Chosen method: a one-time 2–3 min test per headphone** using the phone/laptop mic + a hearing check | Works identically for wired and Bluetooth, needs no extra gear |
+| **Never invent calibration numbers.** If a default can't be sourced, show "level unavailable" | A wrong number means someone under-estimates exposure |
+| **When uncertain, read loud, not quiet.** Dose uses estimate + 1σ | Safety |
+| The "calibration network" idea (users loudness-matching) stays dropped | Needs a large user base we don't have |
 | Naming/branding | Deferred. "EarGuard" is a working name |
+| **Commits show only the user (Tanmay, prime290604@gmail.com). No Claude co-author or attribution lines** | User's explicit request |
+| Order: Mac → Windows/Android → iPhone last (via Apple Health) | iPhone forbids third-party audio capture; needs a $99/yr dev account |
 
-## How calibration works (short version)
+## How the model works (and the v1 test, now retired as the main path)
 
 ```
 live dB at ear = audio signal level (A-weighted dBFS) + volume (dB) + S_device
@@ -155,17 +163,28 @@ placeholder. Two independent hints agree: (1) matching the hearing estimate need
 hard-code a value from this** (rule: never invent calibration numbers). Measure it in
 milestone 3 against a reference.
 
-## NEXT STEPS (pick up here)
+## NEXT STEPS (pick up here) — v2
 
-1. **Milestone 3 — measure the Mac mic's real sensitivity + coupling** against a reference.
-   Candidate references (ask the user which they have): a sound level meter, an Apple Watch
-   (Noise app), AirPods + iPhone Apple Health headphone levels, wired headphones with a
-   published sensitivity/impedance. Then replace DEFAULT_MIC_SENSITIVITY for this mic and
-   tune COUPLING_CORRECTION; re-run and check mic vs hearing agree.
-2. Consider a per-browser note: Chrome's raw MacBook mic level differs from Safari's
-   (Chrome floor −42…−47 vs Safari −51 at the same time), so sensitivity may be per-browser.
-3. Android Chrome milestone-1 run (no Android phone available yet).
-4. Later: headphone/phone database, native apps (see "After milestone 1" below).
+1. **M3 — Mac spike.** In a tiny native Swift prototype, find out whether we can get:
+   (a) the system output signal level, (b) the output volume/gain, (c) the output device
+   name — for Bluetooth and wired — and which permissions each needs (Core Audio process
+   taps, ScreenCaptureKit, a virtual driver, …). Write the result into `docs/PLAN.md`.
+   Needs Xcode/Swift on the user's Mac — check it is installed first.
+2. M4: Mac menu-bar app with the cautious estimate + dose tracking (port `src/core/`;
+   share JSON test vectors between TypeScript and Swift).
+3. M5/M6: database format + schema CI; derive and verify the cautious default from
+   standards and measured data. **Open question for the user: do they have, or can they get
+   access to, a measurement rig or a collaborator with one?**
+4. Android Chrome milestone-1 run (no Android phone yet) — low priority now.
+5. Optional cleanup: label the calibrate page "experimental / for contributors" and link
+   it away from the main Lab page.
+
+Reference data from the user's gear (for later accuracy checks): Sony ULT WEAR (Bluetooth),
+Apple EarPods (wired — Apple Health measures Apple/Beats headphones most accurately).
+Measured on 2026-11-04: iPhone Control Center showed 67 dB → 77 dB for a +10 dBFS step
+(consistent) and 91 dB at max iPhone volume with the Lab's −20 dBFS tone (EarPods ⇒ about
+111 dB for a full-scale tone, from Apple's own calibration). The Mac-mic comparison was
+not completed.
 
 ## THE IMMEDIATE NEXT TASK — milestone 1
 
