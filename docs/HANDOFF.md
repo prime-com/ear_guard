@@ -196,9 +196,9 @@ milestone 3 against a reference.
    setting the default input to "MacBook Pro Microphone" (System Settings → Sound → Input); the Sony's output
    returned to 44.1 kHz. Earlier suspicion that EarGuard's tap aggregate (with the Sony as sub-device) caused it
    was wrong/unproven; the `ClockMode` change (default `builtin` = Mac speakers as tap clock) stays as a
-   harmless precaution. **Still to verify with the user:** that the new default clock mode delivers non-silent
-   levels (`swift run EarGuardMac --print 20` while music plays; fall back to `EARGUARD_CLOCK=none`).
-   Product idea: warn when the default input is a Bluetooth device (it will degrade Bluetooth audio).
+   harmless precaution. **Verified by the user (2026-11-04):** the default `builtin` clock mode delivers real
+   levels (≈ −26 dBFS(A) signal, Sony at slider 0.375 → ≈ 65 dB(A), range 53–77) and music stayed normal.
+   The menu-bar app now also warns when the default mic input is a Bluetooth device.
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.
