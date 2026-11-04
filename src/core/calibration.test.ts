@@ -11,6 +11,14 @@ import {
 } from "./calibration";
 
 describe("levels", () => {
+  it("ignores a constant DC offset (it is not sound)", () => {
+    const n = 48000;
+    const sine = Float32Array.from({ length: n }, (_, i) => 0.1 * Math.sin((2 * Math.PI * 1000 * i) / 48000));
+    const withDc = Float32Array.from(sine, (v) => v + 0.05);
+    expect(blockRmsDbfs(withDc)).toBeCloseTo(blockRmsDbfs(sine), 3);
+    expect(blockRmsDbfs(Float32Array.from({ length: 1000 }, () => 0.02))).toBe(-Infinity); // pure DC = silence
+  });
+
   it("full-scale sine is 0 dBFS (AES17)", () => {
     const n = 48000;
     const s = Float32Array.from({ length: n }, (_, i) => Math.sin((2 * Math.PI * 1000 * i) / 48000));

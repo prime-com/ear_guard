@@ -1,4 +1,4 @@
-import { blockRmsDbfs } from "../core/calibration";
+import { blockDc, blockRmsDbfs } from "../core/calibration";
 
 /** Opens a mic with all voice processing switched off and reports what the browser actually applied. */
 export interface Mic {
@@ -8,6 +8,8 @@ export interface Mic {
   openedAt: number;
   readDbfs(): number;
   readPeak(): number;
+  /** DC offset of the last block read (fraction of full scale). */
+  readDc(): number;
   close(): void;
 }
 
@@ -35,6 +37,9 @@ export async function openMic(ctx: AudioContext, deviceId?: string): Promise<Mic
     readDbfs() {
       analyser.getFloatTimeDomainData(buf);
       return blockRmsDbfs(buf);
+    },
+    readDc() {
+      return blockDc(buf);
     },
     readPeak() {
       let p = 0;

@@ -160,6 +160,8 @@ function meterLoop() {
   $("micDb").textContent = Number.isFinite(db) ? db.toFixed(1) : "—";
   $("bar").style.width = `${Math.max(0, Math.min(100, (db + 100)))}%`;
   $("clip").hidden = peak < 0.99;
+  const dc = mic.readDc();
+  $("dcInfo").textContent = `DC offset ${(20 * Math.log10(Math.abs(dc) + 1e-12)).toFixed(1)} dBFS (ignored in the level above)`;
   requestAnimationFrame(meterLoop);
 }
 

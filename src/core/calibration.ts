@@ -24,9 +24,18 @@ export function rmsToDbfs(rms: number): number {
   return rms > 0 ? 20 * Math.log10(rms * Math.SQRT2) : -Infinity;
 }
 
-export function blockRmsDbfs(samples: ArrayLike<number>): number {
+/** Mean of a block: the DC offset. It carries no sound pressure. */
+export function blockDc(samples: ArrayLike<number>): number {
   let sum = 0;
-  for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+  for (let i = 0; i < samples.length; i++) sum += samples[i];
+  return sum / Math.max(1, samples.length);
+}
+
+/** Level of a block in dBFS, with DC removed (a mic's constant offset is not sound). */
+export function blockRmsDbfs(samples: ArrayLike<number>): number {
+  const dc = blockDc(samples);
+  let sum = 0;
+  for (let i = 0; i < samples.length; i++) sum += (samples[i] - dc) ** 2;
   return rmsToDbfs(Math.sqrt(sum / Math.max(1, samples.length)));
 }
 
