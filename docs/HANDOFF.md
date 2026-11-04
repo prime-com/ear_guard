@@ -133,15 +133,39 @@ Choices made while building it (change if the real-hardware run says so):
   honest outcome; consider a tighter coupling (earcup sealed on the mic) or a quieter time.
 - Was the run on Mac or iPhone, and was volume at max? Not confirmed with the user.
 
+### First complete full-test run (2026-11-04, MacBook Pro + Chrome, Sony ULT WEAR, BT)
+
+The whole flow works on real hardware. Getting there needed: room limit derived from SNR
+(not a fixed −55), click-robust swing (p10–p90), a 0 dBFS mic-test step (room floor here is
+≈ −44 dBFS in Chrome by day), and a build id on each page (GitHub Pages caches ~10 min —
+use `?v=<build>` to bust it).
+
+| | Value |
+|---|---|
+| Room floor | −44.6 dBFS (Chrome, MacBook mic, daytime) |
+| Mic test usable steps | −20 → −29.6, −10 → −19.1, 0 → −9.0 dBFS (signal − played: −9.6/−9.1/−9.0 → linear, no AGC) |
+| Mic estimate | 122.7 ± 4.4 dB (**uses placeholder sensitivity −38 dBFS@94 — wrong**) |
+| Hearing estimate | 87.7 ± 5 dB (thresholds −77.3 / −81.7); previous night 85.2 → repeatable ~2.5 dB |
+| Volume curve | 50 % slider = −17.2 dB; 25 % too quiet to measure in this room |
+| Result | disagree → louder used: 123 dB (dose value 127), "retest suggested" |
+
+**Diagnosis:** the MacBook mic in Chrome is ~35 dB hotter than the generic −38 dBFS
+placeholder. Two independent hints agree: (1) matching the hearing estimate needs ≈ −3 dBFS
+@94 dB SPL; (2) with −38, the quiet room would compute to ≈ 87 dB SPL — impossible. **Do NOT
+hard-code a value from this** (rule: never invent calibration numbers). Measure it in
+milestone 3 against a reference.
+
 ## NEXT STEPS (pick up here)
 
-1. Re-run the **full test** on the Mac (Chrome, built-in mic, Sony on a pillow, volume max)
-   and read the room-check numbers in the message if it fails again. Fix thresholds from data.
-2. Compare mic estimate vs hearing estimate; discuss the gap.
-3. Milestone 3 accuracy check (AirPods + Apple Health, wired headphones with published specs)
-   to replace the placeholder `COUPLING_CORRECTION` / mic sensitivity.
-4. Android Chrome milestone-1 run (no Android phone was available).
-5. Later: headphone/phone database, native apps (see "After milestone 1" below).
+1. **Milestone 3 — measure the Mac mic's real sensitivity + coupling** against a reference.
+   Candidate references (ask the user which they have): a sound level meter, an Apple Watch
+   (Noise app), AirPods + iPhone Apple Health headphone levels, wired headphones with a
+   published sensitivity/impedance. Then replace DEFAULT_MIC_SENSITIVITY for this mic and
+   tune COUPLING_CORRECTION; re-run and check mic vs hearing agree.
+2. Consider a per-browser note: Chrome's raw MacBook mic level differs from Safari's
+   (Chrome floor −42…−47 vs Safari −51 at the same time), so sensitivity may be per-browser.
+3. Android Chrome milestone-1 run (no Android phone available yet).
+4. Later: headphone/phone database, native apps (see "After milestone 1" below).
 
 ## THE IMMEDIATE NEXT TASK — milestone 1
 
