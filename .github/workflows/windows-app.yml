@@ -1,0 +1,26 @@
+name: Windows app
+
+# Only runs for Windows-app changes; the Mac app and the web app are not touched by this workflow.
+on:
+  push:
+    paths: ["app/windows/**", "test-vectors/**", ".github/workflows/windows-app.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Unit tests (shared vectors)
+        run: dotnet test app/windows/EarGuardCore.Tests -c Release
+      - name: Publish single-file exe
+        run: dotnet publish app/windows/EarGuardWin -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
+      # Private: only people with access to the repo's Actions tab can download this.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EarGuard-windows
+          path: out/EarGuard.exe
+          retention-days: 30
