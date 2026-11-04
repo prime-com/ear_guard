@@ -7,7 +7,6 @@ using EarGuard.Win;
 internal static class Program
 {
     [DllImport("kernel32.dll")] private static extern bool AttachConsole(int pid);
-    [DllImport("user32.dll")] private static extern bool DestroyIcon(IntPtr h);
 
     [STAThread]
     private static void Main(string[] args)
@@ -74,6 +73,8 @@ internal sealed class TrayContext : ApplicationContext
     private bool _warned;
     private int _saveCountdown = 30;
     private IntPtr _iconHandle;
+
+    [DllImport("user32.dll")] private static extern bool DestroyIcon(IntPtr h);
 
     public TrayContext(AudioMonitor monitor, Tracker tracker, DoseStore store)
     {
