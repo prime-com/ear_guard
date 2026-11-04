@@ -14,6 +14,7 @@ func runHeadless(seconds: Int) {
         case .playing(let e, let sig, _): line += String(format: "signal %.1f dBFS(A) → ≈%.0f dB(A) (%.0f–%.0f) cons=%.0f  week=%.4f%%", sig, e.dbA, e.low, e.high, e.conservative, tracker.weekFraction() * 100)
         case .notHeadphones: line += "not headphones (not tracked)"
         case .muted: line += "muted"
+        case .veryQuiet: line += "very quiet (not counted)"
         case .silent: line += "silent"
         }
         print(line)

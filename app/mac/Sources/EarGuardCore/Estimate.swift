@@ -44,3 +44,11 @@ public func estimateLevel(signalDbA: Double, volumeScalar: Double, device: Estim
     let level = earLevelDb(signalDbA: signalDbA, volumeDb: volumeDb(fromScalar: volumeScalar), sDevice: device.value)
     return LevelEstimate(dbA: level, sigma: (device.sigma * device.sigma + volumeMappingSigma * volumeMappingSigma).squareRoot())
 }
+
+/// Below this the estimate means "practically silent", not a listening level. It also catches the
+/// slider at 0 (volumeDb → −120) and near-silent signals, which would otherwise give negative dB.
+public let minReportableDb = 20.0
+
+public extension LevelEstimate {
+    var isReportable: Bool { dbA.isFinite && dbA >= minReportableDb }
+}

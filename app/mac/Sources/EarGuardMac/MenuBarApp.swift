@@ -78,6 +78,10 @@ final class MenuBarApp: NSObject, NSApplicationDelegate {
             statusItem.button?.title = "🎧" + warn
             levelItem.title = "Muted"
             detailItem.title = ""
+        case .veryQuiet:
+            statusItem.button?.title = "🎧" + warn
+            levelItem.title = "Very quiet (below \(Int(minReportableDb)) dB) — not counted"
+            detailItem.title = ""
         case .silent:
             statusItem.button?.title = "🎧" + warn
             levelItem.title = "No sound playing"

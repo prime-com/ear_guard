@@ -7,6 +7,7 @@ final class Tracker {
         case notHeadphones              // speakers / display: not tracked
         case muted
         case silent                     // nothing heard (or capture permission missing)
+        case veryQuiet                  // estimate below minReportableDb (e.g. slider at 0): not shown, not counted
         case playing(LevelEstimate, signalDbfsA: Double, volume: Double?)
     }
 
@@ -29,6 +30,7 @@ final class Tracker {
         silentSeconds = 0
         // Volume unknown (some devices expose no slider): assume maximum — the loud side.
         let est = estimateLevel(signalDbA: w.dbfsA, volumeScalar: r.output.volume ?? 1)
+        guard est.isReportable else { return set(.veryQuiet) }
         if !paused { store.add(pa2h: exposurePa2h(db: est.conservative, seconds: r.seconds), at: date) }
         return set(.playing(est, signalDbfsA: w.dbfsA, volume: r.output.volume))
     }

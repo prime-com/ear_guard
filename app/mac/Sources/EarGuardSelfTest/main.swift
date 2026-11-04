@@ -74,6 +74,13 @@ expect(estimateLevel(signalDbA: -15, volumeScalar: 1).dbA > estimateLevel(signal
 near(volumeDb(fromScalar: 1), 0, 1e-12, "max volume = 0 dB")
 expect(volumeDb(fromScalar: 0) <= -100, "volume 0 = silence")
 
+// ---- quiet / zero-volume never produces a negative or "reportable" level ----
+expect(!estimateLevel(signalDbA: -15, volumeScalar: 0).isReportable, "slider at 0 is not reportable")
+expect(estimateLevel(signalDbA: -15, volumeScalar: 0).dbA < 0, "(slider 0 really would be negative without the guard)")
+expect(!estimateLevel(signalDbA: -100, volumeScalar: 1).isReportable, "near-silent signal is not reportable")
+expect(!estimateLevel(signalDbA: -.infinity, volumeScalar: 1).isReportable, "−∞ signal is not reportable")
+expect(estimateLevel(signalDbA: -15, volumeScalar: 0.5).isReportable, "normal listening is reportable")
+
 // ---- dose store: rolling week, persistence ----
 let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("earguard-selftest-\(UUID().uuidString).json")
 let now = Date(timeIntervalSince1970: 1_800_000_000)
