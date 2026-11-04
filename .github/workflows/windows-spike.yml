@@ -14,3 +14,10 @@ jobs:
         with:
           dotnet-version: "8.0.x"
       - run: dotnet build spike/win-audio -c Release
+      # One self-contained .exe: nothing to install on the PC. Private artifact (Actions tab only).
+      - run: dotnet publish spike/win-audio -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EarGuard-windows-spike
+          path: out/WinSpike.exe
+          retention-days: 30
