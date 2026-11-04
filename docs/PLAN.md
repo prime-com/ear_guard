@@ -164,6 +164,24 @@ The user asked for "what we have on the Mac" on iPhone, free, ideally via Expo G
   an independently computed answer (26 MB export, 120 k unrelated records). **Not yet tried with a
   real iPhone export.** Not live: needs a fresh export each time.
 
+### 3d. Android (2026-11-04)
+
+- Live capture is possible from Android 10 via `AudioPlaybackCapture` + `MediaProjection` (one-time user consent, plus
+  `RECORD_AUDIO`). Limits: only USAGE_MEDIA/GAME/UNKNOWN audio, and any app can opt out
+  (`allowAudioPlaybackCapture="false"`) — some streaming apps may be silent to us.
+- Android 14's own sound-dose (CSD) has no app-facing API that we found, and reportedly doesn't track Bluetooth
+  headphones, so our own estimate still matters there.
+- `android/` mirrors the Mac app: Kotlin core (dose, A-weighting, level meter, estimate, dose store) checked against
+  `test-vectors/core.json`; `MonitorService` (foreground, mediaProjection) captures 48 kHz stereo float and reports
+  once a second; `Devices.kt` reads the routed output (API 33+) incl. **Bluetooth call mode (SCO)** detection and
+  the media-stream volume index. Same unverified loud-leaning placeholders (100 ± 10 dB, 20·log10 volume).
+- Built by CI only (no local Android SDK): `.github/workflows/android.yml` → artifact `EarGuard-android-debug-apk`
+  (private; a public release was deliberately not created without the owner's approval).
+- Unknowns for the first phone run: is the capture before or after the stream volume; does Bluetooth absolute volume
+  make the index meaningless; which apps block capture.
+- **iPhone live level is not possible for a free app** (iOS blocks audio capture; live Health access needs the paid
+  program) — the free path is `health.html` + Control Center's Hearing tile.
+
 ### Volume curve
 Slider position → dB is not linear and differs per OS and, for Bluetooth, per device
 (absolute volume). Measured once: Mac slider at 50 % ≈ −17 dB on the Sony. The apps need a

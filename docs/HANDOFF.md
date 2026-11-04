@@ -201,6 +201,15 @@ milestone 3 against a reference.
    harmless precaution. **Verified by the user (2026-11-04):** the default `builtin` clock mode delivers real
    levels (≈ −26 dBFS(A) signal, Sony at slider 0.375 → ≈ 65 dB(A), range 53–77) and music stayed normal.
    The menu-bar app now also warns when the default mic input is a Bluetooth device.
+   **Windows (user HAS a Windows PC) and Android (user has a phone) — pending hardware runs:**
+   - Windows: user runs `spike/win-audio` (`dotnet run -- 30`, needs Git + .NET 8 SDK via winget) and pastes
+     the output; look at: device bus/form factor, volume dB, loopback level vs volume (pre/post master volume?),
+     any Bluetooth "Hands-Free" capture device.
+   - Android: CI built `android/` (run 41810174873: tests green, APK 1.9 MB, artifact
+     `EarGuard-android-debug-apk` — private). User downloads it from the Actions run page, extracts the zip,
+     installs `app-debug.apk`, taps Start monitoring (mic perm + notifications + screen-capture consent), plays
+     music through headphones, moves the volume, taps Share log, and pastes it. Then compare to the Mac behaviour.
+   - Asked the user (unanswered): whether to publish the APK as a public GitHub release (needs their OK).
 3. M5/M6: database format + schema CI; derive and verify the cautious default from
    standards and published specs. **No measurement rig is available (user, 2026-11-04) —
    don't ask again;** layer 2 is spec-derived only.
