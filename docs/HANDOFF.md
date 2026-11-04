@@ -304,3 +304,10 @@ harder on the hearing check for Bluetooth devices.
 - IAudioEndpointVolume gives real dB (0.20 = -23.6, 0.50 = -10.3, 0.76 = -4.1, 0.37 = -14.7), not a 20*log10 guess. Windows does not need the Mac's assumed volume curve.
 - Unknown: how the headset maps the Bluetooth volume to sound pressure (S_device is still the placeholder).
 - Next: Windows tray app reusing the C#-free core (port Dose/Estimate/AWeighting).
+
+## Android result (Samsung SM-F766B, Android 16 / API 36, Apple EarPods over USB-C)
+- Install and run work. Playback capture (AudioPlaybackCapture) hears the music app; the screen-capture consent flow works.
+- Device detected correctly: "USB-Audio - EarPods", type USB headset, counted as headphones.
+- The captured signal is BEFORE the volume: it stayed about -10 to -14 dBFS (unweighted) while the stream volume went 12/15 -> 4/15. So volume is added back by us, as designed.
+- Volume is only an index (0-15), mapped with 20*log10(index/15) (assumption, unverified). Estimates read 67-89 dB(A) at 12/15; S_device is still the 100 +/- 10 placeholder (EarPods were about 111 on iPhone Health, so this likely reads low).
+- Not yet tested: Bluetooth headphones on Android; which apps block capture; the phone's own sound-dose figure for comparison.
