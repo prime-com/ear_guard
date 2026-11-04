@@ -34,9 +34,10 @@ public class CoreTests
     [Fact] public void AWeightingReferencePoints()
     {
         var f = new AWeightingFilter(48000);
-        Assert.True(Math.Abs(f.ResponseDb(1000)) < 0.01);
-        Assert.True(Math.Abs(f.ResponseDb(100) - -19.1) < 0.3);
-        Assert.True(Math.Abs(f.ResponseDb(10000) - -2.5) < 0.4);
+        // same IEC 61672 nominal values and tolerance as the Mac self-test
+        (double hz, double want)[] nominal = { (31.5, -39.4), (63, -26.2), (125, -16.1), (250, -8.6), (500, -3.2), (1000, 0.0), (2000, 1.2), (4000, 1.0), (8000, -1.1) };
+        foreach (var (hz, want) in nominal)
+            Assert.True(Math.Abs(f.ResponseDb(hz) - want) <= 0.7, $"{hz} Hz: expected {want}, got {f.ResponseDb(hz):F2}");
     }
 
     [Fact] public void MeterReadsFullScaleSineAsZeroDbfs()
