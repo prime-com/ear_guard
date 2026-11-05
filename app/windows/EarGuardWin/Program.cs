@@ -70,6 +70,8 @@ internal sealed class TrayContext : ApplicationContext
     private readonly ToolStripMenuItem _week = new("") { Enabled = false };
     private readonly ToolStripMenuItem _pause = new("Pause tracking");
     private readonly ToolStripMenuItem _sensitive = new("Sensitive mode (75 dB limit)");
+    private readonly ToolStripMenuItem _startup = new("Start with Windows");
+    private readonly Settings _settings = Settings.Load();
     private bool _warned;
     private int _saveCountdown = 30;
     private IntPtr _iconHandle;
@@ -83,18 +85,40 @@ internal sealed class TrayContext : ApplicationContext
         menu.Items.AddRange(new ToolStripItem[]
         {
             _level, _device, new ToolStripSeparator(), _today, _week, new ToolStripSeparator(),
-            _pause, _sensitive,
+            _pause, _sensitive, _startup,
             new ToolStripMenuItem("About this estimate") { Enabled = false, ToolTipText = "A rough estimate, not a measurement." },
             new ToolStripSeparator(),
         });
         var quit = new ToolStripMenuItem("Quit EarGuard");
         quit.Click += (_, _) => Quit();
         menu.Items.Add(quit);
-        _pause.Click += (_, _) => { _tracker.Paused = !_tracker.Paused; _pause.Text = _tracker.Paused ? "Resume tracking" : "Pause tracking"; };
+        // remembered between launches
+        _tracker.Paused = _settings.Paused;
+        _tracker.Mode = _settings.Sensitive ? DoseMode.Sensitive : DoseMode.Standard;
+        _sensitive.Checked = _settings.Sensitive;
+        _pause.Checked = _settings.Paused;
+        _pause.Text = _settings.Paused ? "Resume tracking" : "Pause tracking";
+        // First run: start with Windows by default (a safety tool should always be on); the menu turns it off.
+        if (!_settings.StartupAsked) { Startup.Set(true); _settings.StartupAsked = true; _settings.Save(); }
+        _startup.Checked = Startup.IsEnabled();
+
+        _pause.Click += (_, _) =>
+        {
+            _tracker.Paused = !_tracker.Paused;
+            _pause.Text = _tracker.Paused ? "Resume tracking" : "Pause tracking";
+            _pause.Checked = _tracker.Paused;
+            _settings.Paused = _tracker.Paused; _settings.Save();
+        };
         _sensitive.Click += (_, _) =>
         {
             _tracker.Mode = _tracker.Mode == DoseMode.Standard ? DoseMode.Sensitive : DoseMode.Standard;
             _sensitive.Checked = _tracker.Mode == DoseMode.Sensitive;
+            _settings.Sensitive = _sensitive.Checked; _settings.Save();
+        };
+        _startup.Click += (_, _) =>
+        {
+            Startup.Set(!Startup.IsEnabled());
+            _startup.Checked = Startup.IsEnabled();
         };
         _tray = new NotifyIcon { ContextMenuStrip = menu, Visible = true, Text = "EarGuard" };
         SetIcon("--", Color.Gray);
@@ -128,6 +152,7 @@ internal sealed class TrayContext : ApplicationContext
             case TrackState.NotHeadphones: _level.Text = "Not headphones - not tracked"; icon = "--"; color = Color.Gray; tip = "Not headphones"; break;
             default: _level.Text = "No sound playing"; icon = "--"; color = Color.Gray; tip = "No sound playing"; break;
         }
+        if (_tracker.Paused) { _level.Text = "Paused - not counting.  " + _level.Text; tip = "Paused. " + tip; }
         if (r.CallMode) { _level.Text = "Headphones are in CALL MODE (phone-like sound). " + _level.Text; tip = "Call mode! " + tip; }
         if (r.Note != null) _level.Text = r.Note;
         _tray.Text = tip.Length > 120 ? tip[..120] : tip;

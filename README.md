@@ -33,6 +33,9 @@ Download the latest build from the **[Releases page](https://github.com/prime-co
 2. SmartScreen may warn that the app is unrecognised (it is not code-signed): **More info → Run anyway**.
 3. Find the round icon in the tray (bottom-right, maybe behind the `^`). The number on it is the live dB.
    Right-click for today's and the weekly dose.
+4. EarGuard **starts with Windows** by default (turn it off in the right-click menu: *Start with Windows*).
+   Put the `.exe` somewhere permanent first, for example `C:\Program Files\EarGuard` or your Documents folder, not Downloads.
+   If you move it later, switch *Start with Windows* off and on again.
 
 ### Android
 1. Download `EarGuard-android.apk` on the phone and open it. Allow *install unknown apps* if asked.
