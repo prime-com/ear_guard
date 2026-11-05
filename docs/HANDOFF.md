@@ -1,6 +1,6 @@
 # EarGuard — context handoff
 
-Paste this to a fresh Claude session (VS Code extension, CLI, anywhere) to pick up
+Paste this to a fresh AI coding session to pick up
 where the project left off. Read `docs/PLAN.md` next — it holds the v2 plan, the evidence
 behind it, and the math. (The milestone-1/2 sections below are history.)
 
@@ -29,7 +29,7 @@ to be the main path. Read `docs/PLAN.md` (v2) — it has the evidence and the ne
 | **When uncertain, read loud, not quiet.** Dose uses estimate + 1σ | Safety |
 | The "calibration network" idea (users loudness-matching) stays dropped | Needs a large user base we don't have |
 | Naming/branding | Deferred. "EarGuard" is a working name |
-| **Commits show only the user (Tanmay, prime290604@gmail.com). No Claude co-author or attribution lines** | User's explicit request |
+| **Commits show only the user (Tanmay, prime290604@gmail.com). No co-author or attribution lines** | User's explicit request |
 | Order: Mac → Windows/Android → iPhone last (via Apple Health) | iPhone forbids third-party audio capture; needs a $99/yr dev account |
 
 ## How the model works (and the v1 test, now retired as the main path)
